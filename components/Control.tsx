@@ -6,14 +6,20 @@ const Control = ({
   onEdit,
 }: {
   onRestart: () => void;
-  onShuffle: () => void;
+  onShuffle: (max: number, min: number) => void;
   onEdit: () => void;
 }) => {
   return (
     <div className="space-x-2">
-      <Button onClick={onRestart}>Restart</Button>
-      <Button onClick={onShuffle}>Shuffle</Button>
-      <Button onClick={onEdit}> Custom Text</Button>
+      <Button className=" bg-gray-800" onClick={onRestart}>
+        Restart
+      </Button>
+      <Button className=" bg-gray-800" onClick={() => onShuffle(0, 14)}>
+        Shuffle
+      </Button>
+      <Button className=" bg-gray-800" onClick={onEdit}>
+        Custom Text
+      </Button>
     </div>
   );
 };
