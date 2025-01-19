@@ -10,7 +10,7 @@ const Control = ({
   onEdit: () => void;
 }) => {
   return (
-    <div className="space-x-2">
+    <div className="space-x-3 space-y-3">
       <Button className=" bg-gray-800" onClick={onRestart}>
         Restart
       </Button>

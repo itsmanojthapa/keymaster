@@ -27,7 +27,7 @@ export function Result({
   // console.log(arrWps);
 
   return (
-    <Card className="dark">
+    <Card className="dark mt-3">
       <CardHeader>
         <CardTitle>Performance</CardTitle>
       </CardHeader>

@@ -94,10 +94,13 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #008080; /* Darker on hover */
+  /* Darker on hover  */
+  background: #008080;
 }
 
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: #008080 rgb(31 41 55 / var(--tw-bg-opacity, 1)); /* Firefox support */
+  scroll-behavior: smooth;
+  /* Firefox support  */
+  scrollbar-color: #008080 rgb(31 41 55 / var(--tw-bg-opacity, 1));
 }

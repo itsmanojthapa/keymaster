@@ -1,24 +1,16 @@
 import { TypingStats } from "@/types/types";
 import React from "react";
+import Timer from "./Timer";
 
-const Stats = ({ stats }: { stats: TypingStats }) => {
+const Stats = ({ stats, time }: { stats: TypingStats; time: number }) => {
   return (
-    <div className="flex space-x-5 text-center mb-3">
+    <div className=" text-lg flex font-mono mt-3 space-x-5 text-center mb-3 flex-col">
       <div>
-        <div className="text-3xl">{stats.wpm ? stats.wpm : "0"}</div>
-        <div className="underline">WPM</div>
+        Time: <Timer time={time} />s | WPM: {stats.wpm ? stats.wpm : "0"} |
+        Accuracy: {stats.accuracy ? stats.accuracy : "0"}%
       </div>
       <div>
-        <div className="text-3xl">{stats.accuracy ? stats.accuracy : "0"}%</div>
-        <div className="underline">Accuracy</div>
-      </div>
-      <div>
-        <div className="text-3xl">{stats.correct ? stats.correct : "0"}</div>
-        <div className="underline">Correct Word</div>
-      </div>
-      <div>
-        <div className="text-3xl">{stats.wrong ? stats.wrong : "0"}</div>
-        <div className="underline">Wrong Word</div>
+        Correct word: {stats.correct} | Wrong Word: {stats.wrong}
       </div>
     </div>
   );
