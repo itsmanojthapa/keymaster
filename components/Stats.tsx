@@ -10,7 +10,7 @@ const Stats = ({ stats, time }: { stats: TypingStats; time: number }) => {
         Accuracy: {stats.accuracy ? stats.accuracy : "0"}%
       </div>
       <div>
-        Correct word: {stats.correct} | Wrong Word: {stats.wrong}
+        Correct Characters: {stats.correct} | Wrong Characters: {stats.wrong}
       </div>
     </div>
   );

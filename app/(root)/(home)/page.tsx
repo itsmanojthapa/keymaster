@@ -1,18 +1,9 @@
 "use client";
-
-import Control from "@/components/Control";
-import CustomText from "@/components/CustomText";
-import { Result } from "@/components/Result";
-import Stats from "@/components/Stats";
-import { Button } from "@/components/ui/button";
-import { calculateStats } from "@/lib/CalculateStats";
-import { data } from "@/lib/text";
-import { TypingStats } from "@/types/types";
-import { useEffect, useRef, useState } from "react";
+// import { Button } from "@/components/ui/button";
+import { MacbookScroll } from "@/components/ui/macbook-scroll";
 import { motion } from "motion/react";
-import textLength from "@/lib/textLength";
+import Link from "next/link";
 
-type modeTye = "show" | "typing" | "result";
 const motionProps = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
@@ -20,214 +11,48 @@ const motionProps = {
   transition: { type: "spring", duration: 0.3 },
 };
 
-export default function Home() {
-  const [mode, setMode] = useState<modeTye>("show");
-
-  const inputRef = useRef<HTMLInputElement>(null);
-  const timerRef = useRef<number>();
-
-  const [text, setText] = useState(data[0]);
-  const [inputText, setInputText] = useState("");
-
-  const [customTextDiv, setCustomTextDiv] = useState(false);
-  const [timeUsed, setTimeUsed] = useState(0);
-  const [isStarted, setIsStarted] = useState(false);
-  const [startTime, setStartTime] = useState(0);
-
-  const [stats, setStats] = useState<TypingStats>({
-    wpm: 0,
-    accuracy: 0,
-    correct: 0,
-    wrong: 0,
-  });
-  const statsRef = useRef(stats);
-  useEffect(() => {
-    statsRef.current = stats;
-  }, [stats]);
-
-  const [arrWps, setArrWps] = useState<{ time: number; wpm: number }[]>([]);
-
-  const shuffle = (max: number, min: number) => {
-    restart();
-    const something = data[Math.floor(Math.random() * (max - min + 1)) + min];
-    setText(something);
-  };
-
-  const handleCustomTextSave = (text: string) => {
-    setMode("show");
-    restart();
-    text = text.replace(/\s+/g, " ").trim();
-    setText(text);
-  };
-
-  function switchMode(type: modeTye) {
-    if (mode === "show" || type === "typing") {
-      setMode(type);
-    } else if (mode === "typing" && type === "result") {
-      setMode(type);
-    } else if (mode === "result" && type === "show") {
-      setMode(type);
-      setArrWps([]);
-      clearInterval(timerRef.current);
-    }
-  }
-
-  const restart = () => {
-    switchMode("show");
-    setIsStarted(false);
-    setInputText("");
-    setTimeUsed(0);
-    setStats({
-      wpm: 0,
-      accuracy: 0,
-      correct: 0,
-      wrong: 0,
-    });
-    setArrWps([]);
-    setTimeout(() => inputRef.current?.focus(), 300);
-  };
-
-  useEffect(() => {
-    if (isStarted) {
-      const newStats = calculateStats(inputText, text, timeUsed);
-      setStats(newStats);
-      console.log(newStats);
-    }
-  }, [timeUsed, inputText, isStarted, text]);
-
-  useEffect(() => {
-    if (isStarted) {
-      timerRef.current = window.setInterval(() => {
-        setTimeUsed(Date.now() - startTime);
-        setArrWps((prev) => {
-          const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
-          return [...prev, { time: elapsedTime, wpm: statsRef.current.wpm }];
-        });
-      }, 1000 * 1);
-    }
-    return () => clearInterval(timerRef.current);
-  }, [isStarted, startTime]);
-
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newText = e.target.value;
-    setInputText(newText);
-
-    if (!isStarted && newText.length === 1) {
-      switchMode("typing");
-      setIsStarted(true);
-      setStartTime(Date.now());
-    }
-
-    const newStats = calculateStats(newText, text, timeUsed || 1);
-    setStats(newStats);
-
-    //it will kill the Interval when the text is equal to the target text
-    if (newText.length >= text.length) {
-      clearInterval(timerRef.current);
-    }
-    if (inputText.length + 1 === text.length) {
-      switchMode("result");
-    }
-  };
-  useEffect(() => inputRef.current?.focus(), []);
+export default function Type() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen font-mono">
-      <div className="w-full max-w-3xl p-8 pb-20 gap-16 ">
-        <motion.div
-          {...motionProps}
-          className="mb-8 flex justify-between items-center flex-col sm:flex-row">
-          <Control
-            onRestart={restart}
-            onShuffle={shuffle}
-            onEdit={() => setCustomTextDiv(true)}
-          />
-          <div className="flex space-x-5">
-            {mode === "typing" && (
-              <motion.div {...motionProps}>
-                <Button
-                  variant="outline"
-                  className="bg-transparent border-zinc-400"
-                  onClick={() => {
-                    clearInterval(timerRef.current);
-                    setIsStarted(false);
-                    setInputText("");
-                    setMode("result");
-                  }}>
-                  Stop
-                </Button>
-              </motion.div>
-            )}
-          </div>
+      {/* <div className="flex space-x-5">
+        <motion.div {...motionProps}>
+          <Button variant="outline" className="bg-transparent border-zinc-400">
+            Stop
+          </Button>
         </motion.div>
-        <motion.div {...motionProps}> {textLength(text)}</motion.div>
-        {(mode === "show" || mode === "typing") && (
-          <motion.div
-            {...motionProps}
-            className="text-xl overflow-auto custom-scrollbar leading-relaxed rounded-lg focus:border-2 focus:border-green-600 text-wrap">
-            <div className="relative m-6">
-              <div className="flex flex-wrap">
-                {inputText.split("").map((word, i) => {
-                  let color = "text-zinc-400";
-                  if (i < inputText.length) {
-                    color =
-                      word === text[i]
-                        ? "text-green-400"
-                        : "text-red-400 line-through";
-                  }
-                  if (word === " ") {
-                    return (
-                      <span key={i} className={`${color} w-3`}>
-                        {text[i]}
-                      </span>
-                    );
-                  }
-                  return (
-                    <span key={i} className={color}>
-                      {word}
-                    </span>
-                  );
-                })}
-                {text
-                  .split("")
-                  .slice(inputText.length, text.length)
-                  .map((word, i) => {
-                    const color = "text-zinc-400";
-                    return (
-                      <span key={i} className={word === " " ? "w-3" : color}>
-                        {word === " " ? "\u00A0" : word}
-                      </span>
-                    );
-                  })}
-              </div>
-              <input
-                ref={inputRef}
-                value={inputText}
-                type="text"
-                placeholder="Start typing..."
-                onChange={handleInput}
-                className="absolute inset-0 opacity-0 cursor-default w-full h-full resize-none focus:outline-none "
-              />
-            </div>
-          </motion.div>
-        )}
-        {(mode === "typing" || mode === "result") && (
-          <motion.div {...motionProps}>
-            <Stats stats={stats} time={timeUsed} />
-          </motion.div>
-        )}
-        {mode === "result" && (
-          <motion.div {...motionProps}>
-            <Result arrWps={arrWps} />
-          </motion.div>
-        )}
-        {customTextDiv && (
-          <CustomText
-            onClose={() => setCustomTextDiv(false)}
-            onSave={handleCustomTextSave}
-            currentText={text}
-          />
-        )}
-      </div>
+      </div> */}
+      <motion.div {...motionProps}>
+        <MacbookScroll
+          title={
+            <span className="text-6xl font-black text-zinc-100">
+              Unleash Your Typing Potential
+              <br />
+              <span className="text-teal-400"> with KeyMaster</span>
+            </span>
+          }
+          badge={
+            <Link href="https://google.com">
+              <Badge className="h-10 w-10 transform -rotate-12" />
+            </Link>
+          }
+          src={`/keyboard.png`}
+          showGradient={false}
+        />
+      </motion.div>
     </div>
   );
 }
+
+const Badge = ({ className }: { className?: string }) => {
+  return (
+    <svg
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 576 512">
+      <path
+        fill="#63E6BE"
+        d="M64 64C28.7 64 0 92.7 0 128L0 384c0 35.3 28.7 64 64 64l448 0c35.3 0 64-28.7 64-64l0-256c0-35.3-28.7-64-64-64L64 64zm16 64l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zM64 240c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zm16 80l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zm80-176c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zm16 80l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zM160 336c0-8.8 7.2-16 16-16l224 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-224 0c-8.8 0-16-7.2-16-16l0-32zM272 128l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zM256 240c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zM368 128l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zM352 240c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zM464 128l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zM448 240c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zm16 80l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16z"
+      />
+    </svg>
+  );
+};

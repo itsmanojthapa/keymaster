@@ -63,7 +63,7 @@ export function Result({
               fill="none"
               className="bg-blue-500"
               fillOpacity={100}
-              stroke="green"
+              stroke="teal"
               stackId="a"
             />
           </AreaChart>
