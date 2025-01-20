@@ -37,8 +37,10 @@ export function Result({
             accessibilityLayer
             data={arrWps}
             margin={{
+              top: 20,
               left: -20,
-              right: 12,
+              right: 20,
+              bottom: 20,
             }}>
             <CartesianGrid vertical={false} />
             <XAxis

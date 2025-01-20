@@ -6,11 +6,11 @@ const Navbar = () => {
     <nav className="flex justify-around items-center font-bold font-mono p-5">
       <Link
         href="/"
-        className="text-teal  -500 font-black text-xl flex justify-center items-center space-x-3">
+        className="text-zinc-50 font-black text-xl flex justify-center items-center space-x-3">
         <Image src={"/keyboard.png"} alt="" width={40} height={100} />
         <span>KeyMaster</span>
       </Link>
-      <div className="flex space-x-4 text-lg">
+      <div className="flex space-x-5 text-lg">
         <Link href="/type" className="text-zinc-400 hover:text-teal-400">
           Start
         </Link>

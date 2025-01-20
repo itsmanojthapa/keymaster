@@ -13,14 +13,18 @@ const motionProps = {
 
 export default function Type() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen font-mono">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ durration: 1 }}
+      className="flex flex-col items-center justify-center min-h-screen font-mono">
       {/* <div className="flex space-x-5">
-        <motion.div {...motionProps}>
-          <Button variant="outline" className="bg-transparent border-zinc-400">
-            Stop
-          </Button>
-        </motion.div>
-      </div> */}
+            <motion.div {...motionProps}>
+            <Button variant="outline" className="bg-transparent border-zinc-400">
+                Stop
+            </Button>
+            </motion.div>
+        </div> */}
       <motion.div {...motionProps}>
         <MacbookScroll
           title={
@@ -31,7 +35,7 @@ export default function Type() {
             </span>
           }
           badge={
-            <Link href="https://google.com">
+            <Link href="https://keymaster.manojthapa.software">
               <Badge className="h-10 w-10 transform -rotate-12" />
             </Link>
           }
@@ -39,7 +43,7 @@ export default function Type() {
           showGradient={false}
         />
       </motion.div>
-    </div>
+    </motion.div>
   );
 }
 

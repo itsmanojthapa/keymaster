@@ -62,14 +62,12 @@ export default function Type() {
 
   function switchMode(type: modeTye) {
     if (mode === "show" || type === "typing") {
-      setMode(type);
     } else if (mode === "typing" && type === "result") {
-      setMode(type);
     } else if (mode === "result" && type === "show") {
-      setMode(type);
       setArrWps([]);
       clearInterval(timerRef.current);
     }
+    setMode(type);
   }
 
   const restart = () => {
@@ -91,7 +89,6 @@ export default function Type() {
     if (isStarted) {
       const newStats = calculateStats(inputText, text, timeUsed);
       setStats(newStats);
-      console.log(newStats);
     }
   }, [timeUsed, inputText, isStarted, text]);
 
@@ -131,7 +128,7 @@ export default function Type() {
   };
   useEffect(() => inputRef.current?.focus(), []);
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen font-mono">
+    <div className="flex flex-col items-center mt-20 min-h-screen font-mono">
       <div className="w-full max-w-3xl p-8 pb-20 gap-16 ">
         <motion.div
           {...motionProps}
@@ -160,7 +157,9 @@ export default function Type() {
           </div>
         </motion.div>
         {(mode === "show" || mode == "typing") && (
-          <motion.div {...motionProps}> {textLength(text)}</motion.div>
+          <motion.div {...motionProps}>
+            <i>~ {textLength(text)}</i>
+          </motion.div>
         )}
         {(mode === "show" || mode === "typing") && (
           <motion.div
@@ -193,7 +192,7 @@ export default function Type() {
                   .split("")
                   .slice(inputText.length, text.length)
                   .map((word, i) => {
-                    const color = "text-zinc-400";
+                    const color = "text-zinc-600";
                     return (
                       <span key={i} className={word === " " ? "w-3" : color}>
                         {word === " " ? "\u00A0" : word}
