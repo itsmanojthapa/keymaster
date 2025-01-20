@@ -1,8 +1,9 @@
 "use client";
 // import { Button } from "@/components/ui/button";
 import { MacbookScroll } from "@/components/ui/macbook-scroll";
-import { motion } from "motion/react";
+import { motion, useScroll, useTransform } from "motion/react";
 import Link from "next/link";
+import { useRef } from "react";
 
 const motionProps = {
   initial: { opacity: 0, y: 20 },
@@ -12,28 +13,41 @@ const motionProps = {
 };
 
 export default function Type() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start start", "end start"],
+  });
+  const textTransform = useTransform(scrollYProgress, [0, 0.3], [0, 100]);
+  const textOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ durration: 1 }}
-      className="flex dark flex-col items-center justify-center min-h-screen font-mono">
-      {/* <div className="flex space-x-5">
-            <motion.div {...motionProps}>
-            <Button variant="outline" className="bg-transparent border-zinc-400">
-                Stop
-            </Button>
-            </motion.div>
-        </div> */}
-      <motion.div {...motionProps}>
+      className="flex dark flex-col items-center justify-center min-h-screen font-mono"
+      ref={ref}>
+      <motion.div
+        style={{
+          translateY: textTransform,
+          opacity: textOpacity,
+        }}
+        className="mt-40 md:mt-60 px-5">
+        <h2 className="text-3xl lg:text-6xl font-black text-zinc-100 text-center">
+          Unleash Your Typing Potential
+          <br />
+          <span className="text-teal-400"> with KeyMaster</span>
+        </h2>
+
+        <p className="font-bold mt-5 text-zinc-400 flex text-base lg:text-lg text-center">
+          Enhance speed, accuracy, and rhythm with engaging challenges and
+          personalized progress
+          <br /> tracking—all in a sleek, intuitive platform.
+        </p>
+      </motion.div>
+      <motion.div {...motionProps} className="overflow-x-hidden w-full">
         <MacbookScroll
-          title={
-            <span className="text-6xl font-black text-zinc-100">
-              Unleash Your Typing Potential
-              <br />
-              <span className="text-teal-400"> with KeyMaster</span>
-            </span>
-          }
+          ref={ref}
           badge={
             <Link href="https://keymaster.manojthapa.software">
               <Badge className="h-10 w-10 transform -rotate-12" />

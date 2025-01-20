@@ -128,7 +128,7 @@ export default function Type() {
   };
   useEffect(() => inputRef.current?.focus(), []);
   return (
-    <div className="flex flex-col items-center mt-20 min-h-screen font-mono">
+    <div className="flex flex-col items-center mt-20 font-mono">
       <div className="w-full max-w-3xl p-8 pb-20 gap-16 ">
         <motion.div
           {...motionProps}

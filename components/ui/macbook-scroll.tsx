@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MotionValue, motion, useScroll, useTransform } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
@@ -30,15 +30,14 @@ import { Button } from "./button";
 export const MacbookScroll = ({
   src,
   showGradient,
-  title,
+  ref,
   badge,
 }: {
   src?: string;
   showGradient?: boolean;
-  title?: string | React.ReactNode;
+  ref?: React.RefObject<HTMLDivElement>;
   badge?: React.ReactNode;
 }) => {
-  const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
@@ -64,14 +63,12 @@ export const MacbookScroll = ({
   );
   const translate = useTransform(scrollYProgress, [0, 1], [0, 1500]);
   const rotate = useTransform(scrollYProgress, [0.1, 0.12, 0.3], [-28, -28, 0]);
-  const textTransform = useTransform(scrollYProgress, [0, 0.3], [0, 100]);
-  const textOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
 
   return (
     <div
       ref={ref}
-      className="min-h-[200vh]  flex flex-col items-center py-0 md:py-60 justify-start flex-shrink-0 [perspective:800px] transform md:scale-100  scale-[0.35] sm:scale-50">
-      <motion.h2
+      className="min-h-[170vh] flex flex-col items-center py-0 md:py-60 justify-start flex-shrink-0 [perspective:400px] transform md:scale-100  scale-[0.35] sm:scale-50">
+      {/* <motion.h2
         style={{
           translateY: textTransform,
           opacity: textOpacity,
@@ -83,12 +80,16 @@ export const MacbookScroll = ({
           </span>
         )}
       </motion.h2>
-      <p className="mb-20 text-zinc-400 flex text-lg text-center">
+      <motion.p
+        style={{
+          translateY: textTransform,
+          opacity: textOpacity,
+        }}
+        className=" font-bold mb-20  text-zinc-400 flex text-lg text-center">
         Enhance speed, accuracy, and rhythm with engaging challenges and
         personalized progress
         <br /> tracking—all in a sleek, intuitive platform.
-      </p>
-      {/* Lid */}
+      </motion.p> */}
       <Lid
         src={src}
         scaleX={scaleX}
@@ -98,7 +99,6 @@ export const MacbookScroll = ({
       />
       {/* Base area */}
       <div className="h-[22rem] w-[32rem] bg-gray-200 dark:bg-[#272729] rounded-2xl overflow-hidden relative -z-10 ">
-        {/* above keyboard bar */}
         <div className="h-10 w-full relative">
           <div className="absolute inset-x-0 mx-auto w-[80%] h-4 bg-[#050505]" />
         </div>
@@ -151,7 +151,7 @@ export const Lid = ({
           }}
           className="absolute inset-0 bg-[#010101] rounded-lg flex items-center justify-center">
           <span className="text-white">
-            <AceternityLogo />
+            <Image src={"/keyboard.png"} alt="" width={40} height={100} />
           </span>
         </div>
       </div>
@@ -650,26 +650,6 @@ export const OptionKey = ({ className }: { className: string }) => {
         width="32"
         height="32"
         stroke="none"
-      />
-    </svg>
-  );
-};
-
-const AceternityLogo = () => {
-  return (
-    <svg
-      width="66"
-      height="65"
-      viewBox="0 0 66 65"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-3 w-3 text-white">
-      <path
-        d="M8 8.05571C8 8.05571 54.9009 18.1782 57.8687 30.062C60.8365 41.9458 9.05432 57.4696 9.05432 57.4696"
-        stroke="currentColor"
-        strokeWidth="15"
-        strokeMiterlimit="3.86874"
-        strokeLinecap="round"
       />
     </svg>
   );
