@@ -17,7 +17,7 @@ export default function Type() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ durration: 1 }}
-      className="flex flex-col items-center justify-center min-h-screen font-mono">
+      className="flex dark flex-col items-center justify-center min-h-screen font-mono">
       {/* <div className="flex space-x-5">
             <motion.div {...motionProps}>
             <Button variant="outline" className="bg-transparent border-zinc-400">
@@ -39,7 +39,6 @@ export default function Type() {
               <Badge className="h-10 w-10 transform -rotate-12" />
             </Link>
           }
-          src={`/keyboard.png`}
           showGradient={false}
         />
       </motion.div>

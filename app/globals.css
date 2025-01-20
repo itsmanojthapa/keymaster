@@ -104,3 +104,23 @@ body {
   /* Firefox support  */
   scrollbar-color: #008080 rgb(31 41 55 / var(--tw-bg-opacity, 1));
 }
+/* Start typing button animate*/
+@keyframes cursor-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.animate-cursor-blink {
+  animation: cursor-blink 1s step-end infinite;
+}
+
+#root {
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+}

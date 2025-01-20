@@ -24,6 +24,8 @@ import { IconCommand } from "@tabler/icons-react";
 import { IconCaretLeftFilled } from "@tabler/icons-react";
 import { IconCaretDownFilled } from "@tabler/icons-react";
 import Image from "next/image";
+import Link from "next/link";
+import { Button } from "./button";
 
 export const MacbookScroll = ({
   src,
@@ -127,7 +129,6 @@ export const Lid = ({
   scaleY,
   rotate,
   translate,
-  src,
 }: {
   scaleX: MotionValue<number>;
   scaleY: MotionValue<number>;
@@ -165,12 +166,36 @@ export const Lid = ({
         }}
         className="h-96 w-[32rem] absolute inset-0 bg-[#010101] rounded-2xl p-2">
         <div className="absolute inset-0 bg-[#272729] rounded-lg" />
-        <Image
-          src={src as string}
-          alt="aceternity logo"
-          fill
-          className="object-cover object-left-top absolute rounded-lg inset-0 h-full w-full"
-        />
+        <Link href="/type" className="flex relative h-full w-full">
+          <Button
+            className={cn(
+              "relative group flex items-center gap-3 px-8 py-4 bg-zinc-800",
+              "rounded-xl text-zinc-100 font-medium transition-all duration-300",
+              "hover:bg-zinc-700 hover:scale-105 hover:shadow-xl",
+              "hover:shadow-zinc-900/20 active:scale-100",
+              "before:absolute before:inset-0 before:rounded-xl",
+              "before:bg-zinc-600/20 before:animate-pulse",
+              "absolute z-10 bottom-1/4 left-1/2 -translate-x-1/2 text-teal-400 "
+            )}>
+            <Image
+              className={cn(
+                "w-6 h-5 transition-transform duration-300",
+                "group-hover:scale-110 group-hover:rotate-[-5deg]"
+              )}
+              src={"/keyboard.png"}
+              alt=""
+              width={40}
+              height={100}
+            />
+            Start Typing
+          </Button>
+          <Image
+            src={"/video.gif"}
+            alt="aceternity logo"
+            fill
+            className="object-cover object-left-top absolute rounded-lg inset-0 h-full w-full"
+          />
+        </Link>
       </motion.div>
     </div>
   );

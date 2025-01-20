@@ -14,8 +14,9 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Typetest",
-  description: "A simple web app to test typing speed",
+  title: "KeyMaster",
+  description:
+    "Enhance speed, accuracy, and rhythm with engaging challenges and personalized progress tracking—all in a sleek, intuitive platform.",
 };
 
 export default function RootLayout({
