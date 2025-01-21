@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { MotionValue, motion, useScroll, useTransform } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
@@ -30,14 +30,15 @@ import { Button } from "./button";
 export const MacbookScroll = ({
   src,
   showGradient,
-  ref,
+  // ref,
   badge,
 }: {
   src?: string;
   showGradient?: boolean;
-  ref?: React.RefObject<HTMLDivElement>;
+  // ref?: React.RefObject<HTMLDivElement>;
   badge?: React.ReactNode;
 }) => {
+  const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
@@ -61,13 +62,17 @@ export const MacbookScroll = ({
     [0, 0.3],
     [0.6, isMobile ? 1 : 1.5],
   );
-  const translate = useTransform(scrollYProgress, [0, 1], [0, 1500]);
+  const translate = useTransform(
+    scrollYProgress,
+    [0, 1],
+    [0, isMobile ? 3000 : 1500],
+  );
   const rotate = useTransform(scrollYProgress, [0.1, 0.12, 0.3], [-28, -28, 0]);
 
   return (
     <div
       ref={ref}
-      className="flex min-h-[170vh] w-full transform flex-col items-center justify-start pt-0 [perspective:400px] sm:pt-60"
+      className="flex min-h-[170vh] w-full transform flex-col items-center justify-start pt-0 [perspective:800px] sm:pt-60"
     >
       <div className="scale-[0.45] sm:scale-75 md:scale-100">
         <Lid

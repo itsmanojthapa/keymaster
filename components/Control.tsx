@@ -11,7 +11,7 @@ const Control = ({
   onEdit: () => void;
 }) => {
   return (
-    <div className="flex items-center justify-between gap-2 rounded-full bg-zinc-900/90 px-3 py-2 backdrop-blur-sm">
+    <div className="flex w-fit items-center justify-between gap-2 rounded-full bg-zinc-900/90 px-3 py-2 backdrop-blur-sm">
       <Button
         className="rounded-full px-3 py-2 text-zinc-400 transition-all duration-200 hover:scale-105 hover:bg-zinc-800 hover:text-white"
         onClick={onRestart}

@@ -136,43 +136,14 @@ export default function Type() {
 
         <motion.div
           {...motionProps}
-          className="mt-3 flex flex-col items-center justify-between sm:flex-row"
+          className="mx-auto flex w-fit flex-col items-center justify-between space-y-3 sm:flex-row sm:space-x-3 sm:space-y-0"
         >
-          <div className="mx-6 flex w-full justify-between">
-            <div className="flex w-full space-x-3">
-              <Control
-                onRestart={restart}
-                onShuffle={shuffle}
-                onEdit={() => setCustomTextDiv(true)}
-              />
-              <Spec />
-            </div>
-
-            {mode === "typing" && (
-              <motion.div
-                {...motionProps}
-                className="flex items-center justify-center rounded-full bg-zinc-900/90 px-3 py-2 backdrop-blur-sm"
-              >
-                <Button
-                  className="rounded-full px-3 py-2 text-zinc-400 transition-all duration-200 hover:scale-105 hover:bg-zinc-800 hover:text-white"
-                  onClick={() => {
-                    clearInterval(timerRef.current);
-                    setIsStarted(false);
-                    setInputText("");
-                    setMode("result");
-                  }}
-                >
-                  <OctagonX />
-                </Button>
-                {/* <Button
-                  variant="outline"
-                  className="bg-transparent border-zinc-400"
-             
-                  Stop
-                </Button> */}
-              </motion.div>
-            )}
-          </div>
+          <Control
+            onRestart={restart}
+            onShuffle={shuffle}
+            onEdit={() => setCustomTextDiv(true)}
+          />
+          <Spec />
         </motion.div>
 
         {(mode === "show" || mode === "typing") && (
@@ -227,7 +198,25 @@ export default function Type() {
           </motion.div>
         )}
         {(mode === "typing" || mode === "result") && (
-          <motion.div {...motionProps}>
+          <motion.div {...motionProps} className="flex flex-col items-center">
+            {mode === "typing" && (
+              <motion.span
+                {...motionProps}
+                className="flex w-fit items-center justify-center rounded-full bg-zinc-900/90 px-3 py-2 backdrop-blur-sm"
+              >
+                <Button
+                  className="rounded-full px-3 py-2 text-zinc-400 transition-all duration-200 hover:scale-105 hover:bg-zinc-800 hover:text-white"
+                  onClick={() => {
+                    clearInterval(timerRef.current);
+                    setIsStarted(false);
+                    setInputText("");
+                    setMode("result");
+                  }}
+                >
+                  <OctagonX />
+                </Button>
+              </motion.span>
+            )}
             <Stats stats={stats} time={timeUsed} />
           </motion.div>
         )}
