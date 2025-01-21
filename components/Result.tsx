@@ -41,7 +41,8 @@ export function Result({
               left: -20,
               right: 20,
               bottom: 20,
-            }}>
+            }}
+          >
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="time"

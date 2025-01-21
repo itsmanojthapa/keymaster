@@ -32,7 +32,7 @@ export default function Type() {
           translateY: textTransform,
           opacity: textOpacity,
         }}
-        className="mt-40 md:mt-60 px-5">
+        className="mt-20 sm:mt-40 md:mt-60 px-5">
         <h2 className="text-3xl lg:text-6xl font-black text-zinc-100 text-center">
           Unleash Your Typing Potential
           <br />

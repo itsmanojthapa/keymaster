@@ -4,35 +4,40 @@ import { Crown, Flag, Swords, User } from "lucide-react";
 
 const Navbar = () => {
   return (
-    <nav className="flex justify-around pt-5 flex-col font-bold sm:flex-row space-y-5 sm:space-y-0">
+    <nav className="flex flex-col justify-around space-y-5 pt-5 font-bold sm:flex-row sm:space-y-0">
       <Link
         href="/"
-        className="text-zinc-50 font-black text-xl flex justify-center items-center space-x-3">
+        className="flex items-center justify-center space-x-3 text-xl font-black text-zinc-50"
+      >
         <Image src={"/keyboard.png"} alt="" width={40} height={100} />
         <span>KeyMaster</span>
       </Link>
-      <div className="flex mt-0 space-x-10 md:space-x-4 text-lg justify-center h-full">
+      <div className="mt-0 flex h-full justify-center space-x-10 text-lg md:space-x-4">
         <Link
           href="/type"
-          className="text-zinc-400 hover:text-teal-400 flex items-center space-x-2">
+          className="flex items-center space-x-2 text-zinc-400 hover:text-teal-400"
+        >
           <Flag />
           <span className="hidden md:block">Start</span>
         </Link>
         <Link
           href="/multiplayer"
-          className="text-zinc-400 hover:text-teal-400 flex items-center space-x-2">
+          className="flex items-center space-x-2 text-zinc-400 hover:text-teal-400"
+        >
           <Swords />
           <span className="hidden md:block">Multiplayer</span>
         </Link>
         <Link
           href="/leaderboard"
-          className="text-zinc-400 hover:text-teal-400 flex items-center space-x-2">
+          className="flex items-center space-x-2 text-zinc-400 hover:text-teal-400"
+        >
           <Crown />
           <span className="hidden md:block">Leaderboard</span>
         </Link>
         <Link
           href="/profile"
-          className="text-zinc-400 hover:text-teal-400 flex items-center space-x-2">
+          className="flex items-center space-x-2 text-zinc-400 hover:text-teal-400"
+        >
           <User />
           <span className="hidden md:block">Profile</span>
         </Link>

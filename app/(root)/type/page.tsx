@@ -11,6 +11,8 @@ import { TypingStats } from "@/types/types";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import textLength from "@/lib/textLength";
+import { Spec } from "@/components/spec";
+import { OctagonX } from "lucide-react";
 
 type modeTye = "show" | "typing" | "result";
 const motionProps = {
@@ -24,7 +26,7 @@ export default function Type() {
   const [mode, setMode] = useState<modeTye>("show");
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const timerRef = useRef<number>();
+  const timerRef = useRef<number>(); //store a mutable value that does not cause a re-render when updated, allows you to persist values between renders.
 
   const [text, setText] = useState(data[0]);
   const [inputText, setInputText] = useState("");
@@ -128,43 +130,56 @@ export default function Type() {
   };
   useEffect(() => inputRef.current?.focus(), []);
   return (
-    <div className="flex flex-col items-center mt-20 font-mono">
-      <div className="w-full max-w-3xl p-8 pb-20 gap-16 ">
+    <div className="mt-20 flex flex-col items-center font-mono">
+      <div className="w-full max-w-3xl gap-16 p-8 pb-20">
+        <motion.i {...motionProps}>~ {textLength(text)}</motion.i>
+
         <motion.div
           {...motionProps}
-          className="mb-8 flex justify-between items-center flex-col sm:flex-row">
-          <Control
-            onRestart={restart}
-            onShuffle={shuffle}
-            onEdit={() => setCustomTextDiv(true)}
-          />
-          <div className="flex space-x-5">
+          className="mt-3 flex flex-col items-center justify-between sm:flex-row"
+        >
+          <div className="mx-6 flex w-full justify-between">
+            <div className="flex w-full space-x-3">
+              <Control
+                onRestart={restart}
+                onShuffle={shuffle}
+                onEdit={() => setCustomTextDiv(true)}
+              />
+              <Spec />
+            </div>
+
             {mode === "typing" && (
-              <motion.div {...motionProps}>
+              <motion.div
+                {...motionProps}
+                className="flex items-center justify-center rounded-full bg-zinc-900/90 px-3 py-2 backdrop-blur-sm"
+              >
                 <Button
-                  variant="outline"
-                  className="bg-transparent border-zinc-400"
+                  className="rounded-full px-3 py-2 text-zinc-400 transition-all duration-200 hover:scale-105 hover:bg-zinc-800 hover:text-white"
                   onClick={() => {
                     clearInterval(timerRef.current);
                     setIsStarted(false);
                     setInputText("");
                     setMode("result");
-                  }}>
-                  Stop
+                  }}
+                >
+                  <OctagonX />
                 </Button>
+                {/* <Button
+                  variant="outline"
+                  className="bg-transparent border-zinc-400"
+             
+                  Stop
+                </Button> */}
               </motion.div>
             )}
           </div>
         </motion.div>
-        {(mode === "show" || mode == "typing") && (
-          <motion.div {...motionProps}>
-            <i>~ {textLength(text)}</i>
-          </motion.div>
-        )}
+
         {(mode === "show" || mode === "typing") && (
           <motion.div
             {...motionProps}
-            className="text-xl overflow-auto custom-scrollbar leading-relaxed rounded-lg">
+            className="custom-scrollbar overflow-auto rounded-lg text-xl leading-relaxed"
+          >
             <div className="relative m-6">
               <div className="flex flex-wrap">
                 {inputText.split("").map((word, i) => {
@@ -206,7 +221,7 @@ export default function Type() {
                 type="text"
                 placeholder="Start typing..."
                 onChange={handleInput}
-                className="absolute inset-0 opacity-0 cursor-default w-full h-full resize-none focus:outline-none "
+                className="absolute inset-0 h-full w-full cursor-default resize-none opacity-0 focus:outline-none"
               />
             </div>
           </motion.div>
