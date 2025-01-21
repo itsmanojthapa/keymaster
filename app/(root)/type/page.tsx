@@ -7,7 +7,7 @@ import Stats from "@/components/Stats";
 import { Button } from "@/components/ui/button";
 import { calculateStats } from "@/lib/CalculateStats";
 import { data } from "@/lib/text";
-import { TypingStats } from "@/types/types";
+import { TimeOption, TypingStats } from "@/types/types";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import textLength from "@/lib/textLength";
@@ -30,6 +30,8 @@ export default function Type() {
 
   const [text, setText] = useState(data[0]);
   const [inputText, setInputText] = useState("");
+
+  const [selectedTime, setSelectedTime] = useState<TimeOption>(15);
 
   const [customTextDiv, setCustomTextDiv] = useState(false);
   const [timeUsed, setTimeUsed] = useState(0);
@@ -97,15 +99,22 @@ export default function Type() {
   useEffect(() => {
     if (isStarted) {
       timerRef.current = window.setInterval(() => {
-        setTimeUsed(Date.now() - startTime);
+        // setTimeUsed(Date.now() - startTime);
+        const time = Date.now() - startTime;
+        setTimeUsed(time);
         setArrWps((prev) => {
-          const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+          const elapsedTime = Math.floor(time / 1000);
           return [...prev, { time: elapsedTime, wpm: statsRef.current.wpm }];
         });
+        if (time >= selectedTime * 1000) {
+          clearInterval(timerRef.current);
+          setIsStarted(false);
+          setMode("result");
+        }
       }, 1000 * 1);
     }
     return () => clearInterval(timerRef.current);
-  }, [isStarted, startTime]);
+  }, [isStarted, startTime, selectedTime]);
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newText = e.target.value;
@@ -143,7 +152,7 @@ export default function Type() {
             onShuffle={shuffle}
             onEdit={() => setCustomTextDiv(true)}
           />
-          <Spec />
+          <Spec setSelectedTime={setSelectedTime} selectedTime={selectedTime} />
         </motion.div>
 
         {(mode === "show" || mode === "typing") && (

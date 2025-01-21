@@ -5,4 +5,6 @@ type TypingStats = {
   wrong: number;
 };
 
-export type { TypingStats };
+type TimeOption = 15 | 30 | 60 | 120;
+
+export type { TypingStats, TimeOption };
