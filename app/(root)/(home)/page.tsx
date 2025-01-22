@@ -49,7 +49,6 @@ export default function Type() {
       </motion.div>
       <motion.div {...motionProps} className="w-full overflow-x-hidden">
         <MacbookScroll
-          // ref={ref}
           badge={
             <Link href="https://keymaster.manojthapa.software">
               <Badge className="h-10 w-10 -rotate-12 transform" />

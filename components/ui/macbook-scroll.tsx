@@ -25,7 +25,7 @@ import { IconCaretLeftFilled } from "@tabler/icons-react";
 import { IconCaretDownFilled } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "./button";
+import StartTypingButton from "../StartTypingButton";
 
 export const MacbookScroll = ({
   src,
@@ -92,7 +92,9 @@ export const MacbookScroll = ({
               <SpeakerGrid />
             </div>
             <div className="mx-auto h-full w-[80%]">
-              <Keypad />
+              <Link href={"/type"}>
+                <Keypad />
+              </Link>
             </div>
             <div className="mx-auto h-full w-[10%] overflow-hidden">
               <SpeakerGrid />
@@ -156,7 +158,7 @@ export const Lid = ({
       >
         <div className="absolute inset-0 rounded-lg bg-[#272729]" />
         <Link href="/type" className="relative flex h-full w-full">
-          <Button
+          {/* <Button
             className={cn(
               "group relative flex items-center gap-3 bg-zinc-800 px-8 py-4",
               "rounded-xl font-medium text-zinc-100 transition-all duration-300",
@@ -178,7 +180,8 @@ export const Lid = ({
               height={100}
             />
             Start Typing
-          </Button>
+          </Button> */}
+          <StartTypingButton />
           <Image
             src={"/video.gif"}
             alt="aceternity logo"
