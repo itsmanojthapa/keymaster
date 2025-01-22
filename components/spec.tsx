@@ -17,6 +17,7 @@ export function Spec({
           className={cn(
             "flex items-center gap-2 rounded-full px-4 py-2 transition-all duration-200 hover:scale-105",
             "bg-zinc-800 text-white",
+            `max-[420px]:hidden`,
             // "text-zinc-400 hover:text-zinc-300",
           )}
         >
@@ -24,7 +25,7 @@ export function Spec({
           <span className="text-sm font-medium">time</span>
         </button>
         {/* Divider */}
-        <div className="mx-2 h-6 w-px bg-zinc-700" />
+        <div className="mx-2 h-6 w-px bg-zinc-700 max-[420px]:hidden" />
         <div className="flex items-center">
           <div className="flex gap-1 px-1">
             {[15, 30, 60, 120].map((time) => (
@@ -38,7 +39,7 @@ export function Spec({
                     : "text-zinc-400 hover:text-zinc-300",
                 )}
               >
-                {time}
+                {time}s
               </button>
             ))}
           </div>

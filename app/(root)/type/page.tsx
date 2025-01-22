@@ -139,13 +139,13 @@ export default function Type() {
   };
   useEffect(() => inputRef.current?.focus(), []);
   return (
-    <div className="mt-20 flex flex-col items-center font-mono">
+    <div className="mt-10 flex flex-col items-center font-mono sm:mt-20">
       <div className="w-full max-w-3xl gap-16 p-8 pb-20">
         <motion.i {...motionProps}>~ {textLength(text)}</motion.i>
 
         <motion.div
           {...motionProps}
-          className="mx-auto flex w-fit flex-col items-center justify-between space-y-3 sm:flex-row sm:space-x-3 sm:space-y-0"
+          className="mx-auto mt-3 flex w-fit flex-col items-center justify-between space-y-3 sm:flex-row sm:space-x-3 sm:space-y-0"
         >
           <Control
             onRestart={restart}
