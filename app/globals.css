@@ -124,3 +124,8 @@ body {
   margin: 0 auto;
   text-align: center;
 }
+
+.container {
+  height: calc(100vh - 20px);
+  background-color: #f3f4f6; /* Tailwind equivalent of bg-gray-200 */
+}

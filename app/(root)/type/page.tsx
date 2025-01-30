@@ -167,7 +167,7 @@ export default function Type() {
                   if (i < inputText.length) {
                     color =
                       word === text[i]
-                        ? "text-teal-400"
+                        ? "text-teal-500"
                         : "text-red-400 line-through";
                   }
                   if (word === " ") {

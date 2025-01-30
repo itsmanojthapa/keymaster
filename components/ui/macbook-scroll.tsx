@@ -186,6 +186,7 @@ export const Lid = ({
             src={"/video.gif"}
             alt="aceternity logo"
             fill
+            unoptimized
             className="absolute inset-0 h-full w-full rounded-lg object-cover object-left-top"
           />
         </Link>

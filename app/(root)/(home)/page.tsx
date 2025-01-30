@@ -42,8 +42,8 @@ export default function Type() {
         </h2>
 
         <p className="mt-5 flex text-center text-base font-bold text-zinc-400 lg:text-lg">
-          Enhance speed, accuracy, and rhythm with engaging challenges and
-          personalized progress
+          Enhance speed, accuracy, and rhythm with engaging challenges,
+          multiplayer and personalized progress
           <br /> tracking—all in a sleek, intuitive platform.
         </p>
       </motion.div>
