@@ -18,7 +18,7 @@ export default function Page({
   }, [params]);
 
   const socket = useSocket();
-  const [roomName, setRoom] = useState("home");
+  // const [roomName, setRoom] = useState("home");
 
   if (!slug) return <p>Loading...</p>;
 

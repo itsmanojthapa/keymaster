@@ -43,6 +43,11 @@ const Navbar = () => {
               </Link>
             );
           })}
+          {/* <div
+            className={`flex items-center space-x-2 text-zinc-400 hover:text-teal-400`}
+          >
+            <LogOut />
+          </div> */}
         </div>
       </motion.div>
     </nav>

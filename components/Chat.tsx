@@ -68,9 +68,9 @@ export default function Chat({
       <div className="w-full max-w-xl">
         <div className="w-full max-w-xl rounded-lg bg-zinc-900 p-6 text-white shadow-md">
           <div className="flex justify-between">
-            <h1 className="mb-4 text-2xl font-bold">
+            <div className="mb-4 text-2xl font-bold">
               Room Live: <span>{socket?.connected ? "🍏" : "🍎"}</span>
-            </h1>
+            </div>
             <p>Total Users: {totalUser}</p>
           </div>
           <p className="mb-2">Users in room: {connectedSockets}</p>
