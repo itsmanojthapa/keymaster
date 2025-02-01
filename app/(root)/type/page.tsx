@@ -13,14 +13,10 @@ import { motion } from "motion/react";
 import textLength from "@/lib/textLength";
 import { Spec } from "@/components/spec";
 import { OctagonX } from "lucide-react";
+import { motionSet } from "@/lib/motionSet";
+import ShowText from "@/components/ShowText";
 
 type modeTye = "show" | "typing" | "result";
-const motionProps = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: 20 },
-  transition: { type: "spring", duration: 0.3 },
-};
 
 export default function Type() {
   const [mode, setMode] = useState<modeTye>("show");
@@ -139,12 +135,12 @@ export default function Type() {
   };
   useEffect(() => inputRef.current?.focus(), []);
   return (
-    <div className="mt-10 flex flex-col items-center font-mono sm:mt-20">
-      <div className="w-full max-w-3xl gap-16 p-8 pb-20">
-        <motion.i {...motionProps}>~ {textLength(text)}</motion.i>
+    <div className="pt-16 sm:pt-24">
+      <div className="mx-auto w-full max-w-5xl gap-16 p-8 pb-20">
+        <motion.i {...motionSet}>~ {textLength(text)}</motion.i>
 
         <motion.div
-          {...motionProps}
+          {...motionSet}
           className="mx-auto mt-3 flex w-fit flex-col items-center justify-between space-y-3 sm:flex-row sm:space-x-3 sm:space-y-0"
         >
           <Control
@@ -156,61 +152,23 @@ export default function Type() {
         </motion.div>
 
         {(mode === "show" || mode === "typing") && (
-          <motion.div
-            {...motionProps}
-            className="custom-scrollbar overflow-auto rounded-lg text-xl leading-relaxed"
-          >
-            <div className="relative m-6">
-              <div className="flex flex-wrap">
-                {inputText.split("").map((word, i) => {
-                  let color = "text-zinc-400";
-                  if (i < inputText.length) {
-                    color =
-                      word === text[i]
-                        ? "text-teal-500"
-                        : "text-red-400 line-through";
-                  }
-                  if (word === " ") {
-                    return (
-                      <span key={i} className={`${color} w-3`}>
-                        {text[i]}
-                      </span>
-                    );
-                  }
-                  return (
-                    <span key={i} className={color}>
-                      {word}
-                    </span>
-                  );
-                })}
-                {text
-                  .split("")
-                  .slice(inputText.length, text.length)
-                  .map((word, i) => {
-                    const color = "text-zinc-600";
-                    return (
-                      <span key={i} className={word === " " ? "w-3" : color}>
-                        {word === " " ? "\u00A0" : word}
-                      </span>
-                    );
-                  })}
-              </div>
-              <input
-                ref={inputRef}
-                value={inputText}
-                type="text"
-                placeholder="Start typing..."
-                onChange={handleInput}
-                className="absolute inset-0 h-full w-full cursor-default resize-none opacity-0 focus:outline-none"
-              />
-            </div>
-          </motion.div>
+          <div className="relative">
+            <ShowText inputText={inputText} text={text} />
+            <input
+              ref={inputRef}
+              value={inputText}
+              type="text"
+              placeholder="Start typing..."
+              onChange={handleInput}
+              className="absolute inset-0 h-full w-full cursor-default resize-none opacity-0 focus:outline-none"
+            />
+          </div>
         )}
         {(mode === "typing" || mode === "result") && (
-          <motion.div {...motionProps} className="flex flex-col items-center">
+          <motion.div {...motionSet} className="flex flex-col items-center">
             {mode === "typing" && (
               <motion.span
-                {...motionProps}
+                {...motionSet}
                 className="flex w-fit items-center justify-center rounded-full bg-zinc-900/90 px-3 py-2 backdrop-blur-sm"
               >
                 <Button
@@ -230,7 +188,7 @@ export default function Type() {
           </motion.div>
         )}
         {mode === "result" && (
-          <motion.div {...motionProps}>
+          <motion.div {...motionSet}>
             <Result arrWps={arrWps} />
           </motion.div>
         )}

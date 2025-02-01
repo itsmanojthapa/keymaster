@@ -13,7 +13,7 @@ import React from "react";
 
 const Leaderboard = () => {
   return (
-    <div className="mt-10 flex flex-col items-center font-mono sm:mt-20">
+    <div className="flex flex-col items-center">
       LeaderBoard
       {/* <div className="w-full max-w-3xl gap-16 p-8 pb-20">
         <Table>

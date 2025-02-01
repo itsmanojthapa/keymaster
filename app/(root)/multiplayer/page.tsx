@@ -1,52 +1,17 @@
 "use client";
 
 import { useSocket } from "@/components/context/SocketContext";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import { motion } from "motion/react";
+import { motionSet } from "@/lib/motionSet";
+import { data } from "@/lib/text";
 
-export default function Home() {
+const Multiplayer = () => {
   const socket = useSocket();
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<string[]>([]);
-  const [connectedSockets, setConnectedSockets] = useState(0);
-  const [room, setRoom] = useState("home");
-  const [roomName, setRoomName] = useState(room);
-  const [totalUser, setTotalUser] = useState(0);
+  const [room, setRoom] = useState("");
+  const [roomName, setRoomName] = useState("");
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  useEffect(() => {
-    if (socket) {
-      socket.on("arrSocket", (count: number) => setTotalUser(count));
-      socket.on("arrSocketRoom", (count: number) => setConnectedSockets(count));
-      socket.on("message", (msg: string) =>
-        setMessages((prev) => [...prev, msg]),
-      );
-
-      socket.emit("joinRoom", roomName);
-      socket.on("init", (msgs: string[]) => setMessages(msgs));
-      socket.emit("arrSocketRoom", roomName);
-    }
-
-    return () => {
-      if (socket) {
-        socket.off("init");
-        socket.off("arrSocket");
-        socket.off("message");
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socket]);
-
-  const sendMessageHandler = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (socket && message.trim()) {
-      socket.emit("messageRoom", roomName, message);
-      setMessage("");
-    }
-  };
+  const [text, setText] = useState(data[0]);
 
   const changeRoomHandler = (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,16 +23,15 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-950">
-      <div className="w-full max-w-xl">
-        <div className="w-full max-w-xl rounded-lg bg-zinc-800 p-6 text-white shadow-md">
+    <motion.div className="mx-auto max-w-5xl p-10" {...motionSet}>
+      Multiplayer Arena
+      <div className="mt-3 flex w-full justify-center">
+        <div className="w-full max-w-xl rounded-lg bg-zinc-900 p-6 text-white shadow-md">
           <div className="flex justify-between">
             <h1 className="mb-4 text-2xl font-bold">
               Room Live: <span>{socket?.connected ? "🍏" : "🍎"}</span>
             </h1>
-            <p>Total Users: {totalUser}</p>
           </div>
-          <p className="mb-2">Users in room: {connectedSockets}</p>
           <form onSubmit={changeRoomHandler} className="flex gap-2">
             <input
               type="text"
@@ -78,41 +42,15 @@ export default function Home() {
             />
             <button
               type="submit"
-              className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+              className="rounded bg-teal-500 px-4 py-2 text-white hover:bg-teal-600"
             >
               Set
             </button>
           </form>
         </div>
-        <div className="mt-3 w-full max-w-xl rounded-lg bg-zinc-800 p-6 text-white shadow-md">
-          <h1 className="mb-4 text-2xl font-bold">
-            Real-time Chat <span>{socket?.connected ? "🍏" : "🍎"}</span>
-          </h1>
-          <div className="mb-4 h-96 overflow-y-auto rounded-lg border p-4">
-            {messages.map((msg, index) => (
-              <div key={index} className="mb-2 rounded bg-zinc-700 p-2">
-                {msg}
-              </div>
-            ))}
-            <div className="h-0" ref={messagesEndRef}></div>
-          </div>
-          <form onSubmit={sendMessageHandler} className="flex gap-2">
-            <input
-              type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className="flex-1 rounded border p-2 text-black"
-              placeholder="Type your message..."
-            />
-            <button
-              type="submit"
-              className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-            >
-              Send
-            </button>
-          </form>
-        </div>
       </div>
-    </div>
+    </motion.div>
   );
-}
+};
+
+export default Multiplayer;

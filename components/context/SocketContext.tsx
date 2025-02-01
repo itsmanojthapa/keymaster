@@ -33,7 +33,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <SocketContext.Provider value={socket}>
-      <div id="yesSir">{children}</div>
+      <div>{children}</div>
     </SocketContext.Provider>
   );
 };
