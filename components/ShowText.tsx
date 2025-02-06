@@ -16,7 +16,7 @@ const ShowText = ({
     >
       <div className="relative m-6">
         <div className="flex flex-wrap">
-          {inputText &&
+          {/* {inputText &&
             inputText.split("").map((word, i) => {
               let color = "text-zinc-400";
               if (i < inputText.length) {
@@ -27,7 +27,7 @@ const ShowText = ({
               }
               if (word === " ") {
                 return (
-                  <span key={i} className={`${color} w-3`}>
+                  <span key={i} className={`${color} w-3 border-l-2`}>
                     {text[i]}
                   </span>
                 );
@@ -37,15 +37,30 @@ const ShowText = ({
                   {word}
                 </span>
               );
-            })}
+            })} */}
           {text &&
             text
               .split("")
-              .slice(inputText ? inputText.length : 0, text.length)
+              // .slice(inputText ? inputText.length : 0, text.length)
               .map((word, i) => {
-                const color = "text-zinc-600";
+                const isMatch = inputText
+                  ? word === inputText.charAt(i)
+                  : false;
                 return (
-                  <span key={i} className={word === " " ? "w-3" : color}>
+                  <span
+                    key={i}
+                    className={`border-l-2 border-transparent ${word === " " && "w-2"} ${i === inputText?.length && "animate-blink border-zinc-600"} ${
+                      isMatch
+                        ? "text-teal-500"
+                        : i < (inputText?.length ?? 0)
+                          ? "text-red-500 line-through"
+                          : "text-zinc-600"
+                    } `}
+
+                    // ${isMatch ? "text-teal-500" : i < inputText?.length ? "" : ""}
+                    // ${inputText && inputText.charAt(inputText.length - 1) === word ? "text-teal-500" : ""}
+                    // ${i < (inputText ? inputText.length : 0) && "hidden"}
+                  >
                     {word === " " ? "\u00A0" : word}
                   </span>
                 );
@@ -57,3 +72,5 @@ const ShowText = ({
 };
 
 export default ShowText;
+
+// inputText.charAt(inputText.length - 1) === word

@@ -58,6 +58,15 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      animation: {
+        blink: "blink 1s steps(2, start) infinite",
+      },
+      keyframes: {
+        blink: {
+          "0%, 100%": { borderColor: "teal" },
+          "50%": { borderColor: "black" },
+        },
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

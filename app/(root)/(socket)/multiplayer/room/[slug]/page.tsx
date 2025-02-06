@@ -3,8 +3,9 @@
 import React, { useEffect, useState } from "react";
 import Chat from "@/components/Chat";
 import { redirect } from "next/navigation";
-import { getSocket } from "@/utils/socketio";
+import { disSocket, getSocket } from "@/utils/socketio";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 export default function Page({
   params,
@@ -53,9 +54,9 @@ export default function Page({
 
   useEffect(() => {
     return () => {
-      if (socket) {
-        socket.emit("leaveRoom", slug);
-      }
+      socket?.emit("leaveRoom", slug);
+      setTimeout(() => toast.success("Exiting Room"), 100);
+      disSocket();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -69,6 +70,16 @@ export default function Page({
   return (
     <div className="flex flex-col items-center">
       <div>My Post: {slug}</div>
+      <Button
+        onClick={() => {
+          socket.emit("leaveRoom", slug);
+          disSocket();
+          setTimeout(() => toast.success("Disconnected"), 100);
+          redirect("/multiplayer");
+        }}
+      >
+        Disconnect
+      </Button>
       <Chat socket={socket} slug={slug} />
     </div>
   );

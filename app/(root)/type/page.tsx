@@ -133,6 +133,19 @@ export default function Type() {
       switchMode("result");
     }
   };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" || e.key === "Delete") {
+      e.preventDefault(); // Block backspace and delete
+    }
+    if (inputText.length === 0 && e.key === " ") {
+      e.preventDefault();
+    }
+    if (inputText.charAt(inputText.length - 1) === " " && e.key === " ") {
+      e.preventDefault();
+    }
+  };
+
   useEffect(() => inputRef.current?.focus(), []);
   return (
     <div className="pt-16 sm:pt-24">
@@ -161,6 +174,7 @@ export default function Type() {
               placeholder="Start typing..."
               onChange={handleInput}
               className="absolute inset-0 h-full w-full cursor-default resize-none opacity-0 focus:outline-none"
+              onKeyDown={handleKeyDown} // Prevents Backspace
             />
           </div>
         )}
@@ -188,7 +202,7 @@ export default function Type() {
           </motion.div>
         )}
         {mode === "result" && (
-          <motion.div {...motionSet}>
+          <motion.div {...motionSet} className="mx-auto max-w-2xl">
             <Result arrWps={arrWps} />
           </motion.div>
         )}
