@@ -1,17 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { SocketProvider } from "@/components/context/SocketContext";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "KeyMaster",
@@ -25,10 +15,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-zinc-950 antialiased`}
-      >
-        <SocketProvider>{children}</SocketProvider>
+      <body className={`dark bg-zinc-950 antialiased`}>
+        <main>{children}</main>
+        <Toaster />
       </body>
     </html>
   );
