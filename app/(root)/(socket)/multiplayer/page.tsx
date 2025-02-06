@@ -89,7 +89,7 @@ const Multiplayer = () => {
             Create Room
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="join">
+        <TabsContent value="join" className="focus-visible:ring-0">
           <motion.div
             className="mt-10 flex w-full justify-center"
             {...motionSet}
@@ -125,7 +125,7 @@ const Multiplayer = () => {
             </div>
           </motion.div>
         </TabsContent>
-        <TabsContent value="create">
+        <TabsContent value="create" className="focus-visible:ring-0">
           <motion.div
             className="mt-10 flex w-full flex-col items-center justify-center"
             {...motionSet}

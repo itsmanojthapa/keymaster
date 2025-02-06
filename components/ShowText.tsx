@@ -12,7 +12,7 @@ const ShowText = ({
   return (
     <motion.div
       {...motionSet}
-      className="custom-scrollbar overflow-auto rounded-lg text-xl leading-relaxed"
+      className="custom-scrollbar overflow-auto rounded-lg font-mono text-xl leading-relaxed"
     >
       <div className="relative m-6">
         <div className="flex flex-wrap">
@@ -49,7 +49,7 @@ const ShowText = ({
                 return (
                   <span
                     key={i}
-                    className={`border-l-2 border-transparent ${word === " " && "w-2"} ${i === inputText?.length && "animate-blink border-zinc-600"} ${
+                    className={`border-l-2 border-transparent ${word === " " && "w-3"} ${i === inputText?.length && "animate-blink border-teal-500"} ${
                       isMatch
                         ? "text-teal-500"
                         : i < (inputText?.length ?? 0)

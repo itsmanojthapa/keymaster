@@ -64,7 +64,10 @@ export default {
       keyframes: {
         blink: {
           "0%, 100%": { borderColor: "teal" },
+          "20%": { borderColor: "teal" },
           "50%": { borderColor: "black" },
+          "60%": { borderColor: "black" },
+          "80%": { borderColor: "teal" },
         },
       },
     },
