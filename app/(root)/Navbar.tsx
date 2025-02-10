@@ -19,9 +19,9 @@ const Navbar = () => {
     <nav className="fixed z-50 flex w-full pb-3 pt-5 font-bold backdrop-blur-md">
       <motion.div
         className="mx-auto flex w-full max-w-5xl flex-col justify-between space-y-5 px-10 sm:flex-row sm:space-y-0"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ ease: "easeInOut" }}
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ ease: "easeInOut", duration: 0.8 }}
       >
         <Link
           href="/"

@@ -21,10 +21,7 @@ export default function Type() {
   const textTransform = useTransform(scrollYProgress, [0, 0.3], [0, 100]);
   const textOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ durration: 1 }}
+    <div
       className="dark flex min-h-screen flex-col items-center justify-center font-mono"
       ref={ref}
     >
@@ -33,6 +30,8 @@ export default function Type() {
           translateY: textTransform,
           opacity: textOpacity,
         }}
+        {...motionProps}
+        transition={{ duration: 1 }}
         className="mt-32 px-5 md:mt-60"
       >
         <h2 className="text-center text-3xl font-black text-zinc-100 lg:text-6xl">
@@ -47,7 +46,12 @@ export default function Type() {
           <br /> tracking—all in a sleek, intuitive platform.
         </p>
       </motion.div>
-      <motion.div {...motionProps} className="w-full overflow-x-hidden">
+      <motion.div
+        className="w-full overflow-x-hidden"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ ease: "easeInOut", duration: 0.8 }}
+      >
         <MacbookScroll
           badge={
             <Link href="https://keymaster.manojthapa.software">
@@ -57,7 +61,7 @@ export default function Type() {
           showGradient={false}
         />
       </motion.div>
-    </motion.div>
+    </div>
   );
 }
 

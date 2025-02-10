@@ -141,7 +141,11 @@ export default function Type() {
     if (inputText.length === 0 && e.key === " ") {
       e.preventDefault();
     }
-    if (inputText.charAt(inputText.length - 1) === " " && e.key === " ") {
+
+    if (text.charAt(inputText.length) === " " && e.key === " ") {
+      return;
+    }
+    if (inputText.charAt(inputText.length - 2) === " " && e.key === " ") {
       e.preventDefault();
     }
   };

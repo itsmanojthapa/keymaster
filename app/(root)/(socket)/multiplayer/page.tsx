@@ -5,57 +5,68 @@ import { motion } from "motion/react";
 import { motionSet } from "@/lib/motionSet";
 import { data } from "@/lib/text";
 import ShowText from "@/components/ShowText";
-import { LogIn, Plus } from "lucide-react";
+import { LoaderCircle, LogIn, Plus } from "lucide-react";
 import CustomText from "@/components/CustomText";
 import Control from "@/components/Control";
 import { Spec } from "@/components/spec";
 import { TimeOption } from "@/types/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { redirect, useRouter } from "next/navigation";
-import { toast } from "sonner";
+
+import { useToast } from "@/hooks/use-toast";
+
 import { disSocket, initSocket } from "@/utils/socketio";
 
 const Multiplayer = () => {
   const router = useRouter();
+  const { toast } = useToast();
 
   const [jRoom, setJRoom] = useState("");
 
   const [selectedTime, setSelectedTime] = useState<TimeOption>(15);
   const [text, setText] = useState(data[0]);
   const [customTextDiv, setCustomTextDiv] = useState(false);
+  const [clickedJ, setClickedJ] = useState(false);
+  const [clickedC, setClickedC] = useState(false);
 
   const handleJRoom = (e: React.FormEvent) => {
+    setClickedJ(true);
     e.preventDefault();
     const socket = initSocket();
+
     socket.on("joinRoom", (msg: string, error) => {
       if (error) {
+        setClickedJ(false);
         disSocket();
-        return toast.error(`ERROR: ${msg}`);
+        return toast({ variant: "destructive", title: `ERROR: ${msg}` });
       }
-      toast.success(msg);
+      toast({ title: msg });
       router.push(`/multiplayer/room/${jRoom}`);
-      // redirect(`/multiplayer/room/${jRoom}`);
     });
     if (socket) {
       jRoom.trim();
       socket.emit("joinRoom", jRoom);
     } else {
-      toast.error("ERROR: Socket not initialized");
+      toast({ variant: "destructive", title: "ERROR: Socket not initialized" });
+      setClickedJ(false);
+      disSocket();
     }
   };
   const handleCRoom = () => {
+    setClickedC(true);
     const socket = initSocket();
     socket.on("createRoom", (roomName: string) => {
       socket.emit("joinRoom", roomName);
-      toast.success(`Room created: ${roomName}`);
+      toast({ title: `Room created: ID ${roomName}` });
       redirect(`/multiplayer/room/${roomName}`);
-      // router.push(`/multiplayer/room/${roomName}`);
     });
 
     if (socket) {
-      socket.emit("createRoom");
+      socket.emit("createRoom", text, selectedTime);
     } else {
-      toast.error("ERROR: Socket not initialized");
+      setClickedC(false);
+      toast({ variant: "destructive", title: "ERROR: Socket not initialized" });
+      disSocket();
     }
   };
 
@@ -72,7 +83,7 @@ const Multiplayer = () => {
   return (
     <motion.div className="mx-auto max-w-5xl p-10" {...motionSet}>
       <div className="text-zin text-2xl font-bold">Multiplayer Arena</div>
-      <Tabs defaultValue="create" className="w-full">
+      <Tabs defaultValue="join" className="w-full">
         <TabsList
           className={`mt-10 flex flex-col justify-center space-x-1 space-y-1 bg-transparent text-zinc-50 sm:mt-3 sm:flex-row sm:space-y-0 sm:bg-zinc-800`}
         >
@@ -112,14 +123,25 @@ const Multiplayer = () => {
                     setJRoom(data);
                   }}
                   className="flex-1 rounded border p-2 text-black"
-                  placeholder="Room name..."
+                  placeholder="Room Code"
                 />
                 <button
                   type="submit"
                   className="flex items-center justify-center rounded bg-blue-600 py-1 text-xl font-bold text-white hover:bg-blue-500"
+                  disabled={clickedJ ? true : false}
                 >
-                  <LogIn className="mr-3" />
-                  Join Room
+                  {clickedJ ? (
+                    <LoaderCircle
+                      absoluteStrokeWidth={false}
+                      strokeWidth={3}
+                      className="animate-spin"
+                    />
+                  ) : (
+                    <>
+                      <LogIn className="mr-3" />
+                      Join Room
+                    </>
+                  )}
                 </button>
               </form>
             </div>
@@ -154,9 +176,20 @@ const Multiplayer = () => {
                   type="submit"
                   onClick={handleCRoom}
                   className="flex items-center justify-center space-x-5 rounded bg-teal-600 py-1 text-xl font-bold text-white hover:bg-teal-500"
+                  disabled={clickedC ? true : false}
                 >
-                  <Plus size={28} className="mr-3" />
-                  Create Room
+                  {clickedC ? (
+                    <LoaderCircle
+                      absoluteStrokeWidth={false}
+                      strokeWidth={3}
+                      className="animate-spin"
+                    />
+                  ) : (
+                    <>
+                      <Plus size={28} strokeWidth={2.4} className="mr-3" />
+                      Create Room
+                    </>
+                  )}
                 </button>
               </div>
             </div>

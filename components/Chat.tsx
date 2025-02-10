@@ -1,58 +1,33 @@
 "use client";
 
-// import { disSocket } from "@/utils/socketio";
-import { useEffect, useRef, useState } from "react";
+import { Card } from "./ui/card";
+import { Avatar, AvatarFallback } from "./ui/avatar";
+import { MessageSquare, Send } from "lucide-react";
 import { Socket } from "socket.io-client";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
-export default function Chat({
-  socket,
-  slug,
-}: {
+type ChatProps = {
   socket: Socket;
   slug: string;
-}) {
+  messages: string[];
+  setMessages: Dispatch<SetStateAction<string[]>>;
+};
+
+const Chat = ({ socket, slug, messages }: ChatProps) => {
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<string[]>([]);
-  const [connectedSockets, setConnectedSockets] = useState(0);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Scroll to the bottom of the messages container when new messages are added
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
-  // Initialize socket event listeners
-  useEffect(() => {
-    if (socket) {
-      // Listen for the number of connected sockets in the room
-
-      socket.on("arrSocketRoom", (count: number) => {
-        setConnectedSockets(count);
-      });
-
-      // Listen for new messages in the room
-      socket.on("message", (msg: string) => {
-        setMessages((prev) => [...prev, msg]);
-      });
-
-      // Initialize the room and fetch existing messages
-      socket.emit("joinRoom", slug);
-      socket.once("init", (msgs: string[]) => {
-        if (msgs) setMessages(msgs);
-      });
-
-      setInterval(() => {
-        socket.emit("arrSocketRoom", slug);
-      }, 1000 * 5);
-
-      // Cleanup socket listeners on component unmount
-      return () => {
-        socket.off("arrSocketRoom");
-        socket.off("message");
-        socket.off("init");
-      };
-    }
-  }, [socket, slug]);
 
   // Send a message to the room
   const sendMessageHandler = (e: React.FormEvent) => {
@@ -63,46 +38,52 @@ export default function Chat({
     }
   };
 
-  // useEffect(() => {
-  //   return () => {
-  //     if (socket) disSocket();
-  //   };
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // });
-
   return (
-    <div className="flex w-full items-center justify-center">
-      <div className="w-full max-w-xl">
-        <div className="mt-3 w-full max-w-xl rounded-lg bg-zinc-800 p-6 text-white shadow-md">
-          <h1 className="mb-4 text-2xl font-bold">
-            Real-time Chat: {slug} ({connectedSockets} users){" "}
-            <span>~{socket?.connected ? "🍏" : "🍎"}</span>
-          </h1>
-          <div className="mb-4 h-96 overflow-y-auto rounded-lg border p-4">
-            {messages.map((msg, index) => (
-              <div key={index} className="mb-2 rounded bg-zinc-700 p-2">
-                {msg}
-              </div>
-            ))}
-            <div className="h-0" ref={messagesEndRef}></div>
-          </div>
-          <form onSubmit={sendMessageHandler} className="flex gap-2">
-            <input
-              type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className="flex-1 rounded border p-2 text-black"
-              placeholder="Type your message..."
-            />
-            <button
-              type="submit"
-              className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-            >
-              Send
-            </button>
-          </form>
+    <Card className="border-zinc-800/50 bg-zinc-900/50 p-4 shadow-xl backdrop-blur-sm md:p-6 lg:col-span-2">
+      <div className="mb-6 flex items-center gap-2">
+        <div className="rounded-lg bg-gradient-to-r from-emerald-500 to-emerald-600 p-2">
+          <MessageSquare />
         </div>
+        <h2 className="text-lg font-bold md:text-xl">Chat</h2>
       </div>
-    </div>
+
+      <div className="custom-scrollbar mb-4 h-[300px] space-y-4 overflow-y-auto pr-2 md:h-[400px]">
+        {messages.map((msg, i) => (
+          <div
+            key={i}
+            className="flex items-start gap-3 rounded-lg p-2 transition-colors hover:bg-zinc-800/30"
+          >
+            <Avatar className="h-8 w-8 ring-2 ring-emerald-500/20 md:h-10 md:w-10">
+              <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-blue-500 text-white">
+                Photo
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-medium text-emerald-400">name</p>
+              <p className="text-gray-300">{msg}</p>
+            </div>
+          </div>
+        ))}
+        <div className="h-0" ref={messagesEndRef}></div>
+      </div>
+
+      <form onSubmit={sendMessageHandler} className="flex gap-2">
+        <input
+          type="text"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          className="flex-1 rounded bg-zinc-800/50 p-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+          placeholder="Type your message..."
+        />
+        <button
+          type="submit"
+          className="rounded bg-gradient-to-r from-teal-500 to-blue-600 px-4 py-2 font-bold text-zinc-900 shadow-lg transition-all hover:from-blue-600 hover:to-teal-700 hover:text-zinc-100"
+        >
+          <Send strokeWidth={2} size={20} />
+        </button>
+      </form>
+    </Card>
   );
-}
+};
+
+export default Chat;

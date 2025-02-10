@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "KeyMaster",
@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en ">
       <body className={`dark bg-zinc-950 antialiased`}>
         <main>{children}</main>
         <Toaster />
