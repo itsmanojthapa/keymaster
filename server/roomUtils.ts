@@ -1,17 +1,6 @@
-export interface TypeRoom {
-  roomCode: string;
-  author: string;
-  text: string;
-  users: { id: string; status: "active" | "inactive" }[];
-  time: number;
-  date: Date;
-  messages: string[];
-}
-type TypeRoomsTimeout = {
-  roomCode: string;
-  timeout: NodeJS.Timeout;
-}[];
+import { TypeRoom, TypeRoomsTimeout } from "@/types/types";
 
+export const roomsTimeoutTime = 1000 * 60 * 8; // 8 minutes
 export const roomsTimeout: TypeRoomsTimeout = [];
 export const db: TypeRoom[] = [];
 

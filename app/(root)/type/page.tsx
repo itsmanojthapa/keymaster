@@ -7,7 +7,7 @@ import Stats from "@/components/Stats";
 import { Button } from "@/components/ui/button";
 import { calculateStats } from "@/lib/CalculateStats";
 import { data } from "@/lib/text";
-import { TimeOption, TypingStats } from "@/types/types";
+import { TypeTimeOption, TypeTypingStats } from "@/types/types";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import textLength from "@/lib/textLength";
@@ -27,14 +27,14 @@ export default function Type() {
   const [text, setText] = useState(data[0]);
   const [inputText, setInputText] = useState("");
 
-  const [selectedTime, setSelectedTime] = useState<TimeOption>(15);
+  const [selectedTime, setSelectedTime] = useState<TypeTimeOption>(15);
 
   const [customTextDiv, setCustomTextDiv] = useState(false);
   const [timeUsed, setTimeUsed] = useState(0);
   const [isStarted, setIsStarted] = useState(false);
   const [startTime, setStartTime] = useState(0);
 
-  const [stats, setStats] = useState<TypingStats>({
+  const [stats, setStats] = useState<TypeTypingStats>({
     wpm: 0,
     accuracy: 0,
     correct: 0,

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Timer, Copy, Check, LogOut } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Typists from "@/components/ui/Typists";
 import Chat from "@/components/Chat";
 import { motion } from "framer-motion";
@@ -10,8 +10,10 @@ import { motionSet } from "@/lib/motionSet";
 import { disSocket, getSocket } from "@/utils/socketio";
 import { useToast } from "@/hooks/use-toast";
 import { redirect } from "next/navigation";
-import { TypeRoom } from "@/server/roomUtils";
 import ShowText from "@/components/ShowText";
+import { Card } from "@/components/ui/card";
+import Pck from "@/components/Pck";
+import { TypeRoom, TypeUser } from "@/types/types";
 
 export default function Page({
   params,
@@ -25,13 +27,14 @@ export default function Page({
   const [messages, setMessages] = useState<string[]>([]);
   const [connectedSockets, setConnectedSockets] = useState(0);
   const [status, setStatus] = useState(true);
-  const [roomData, setRoomData] = useState<{
-    roomCode: string;
-    author: string;
-    text: string;
-    time: number;
-    users: { id: string; status: "active" | "inactive" }[];
-  } | null>();
+  const [roomData, setRoomData] = useState<TypeRoom | null>();
+
+  const [inputText, setInputText] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const [countdown, setCountdown] = useState<number | false>(false);
+  const [start, setStart] = useState<boolean>(false);
+  // const [result, setResult] = useState<TypeTypingStats | null>(null);
 
   // Authentication check (replace with actual logic)
   function auth() {
@@ -52,16 +55,10 @@ export default function Page({
       redirect("/multiplayer");
     }
 
-    socket.on("init", (roomData: TypeRoom) => {
+    socket.once("init", (roomData: TypeRoom) => {
       if (roomData) {
         setMessages(roomData?.messages || []);
-        setRoomData({
-          roomCode: roomData.roomCode,
-          author: roomData.author,
-          text: roomData.text,
-          users: roomData?.users || [],
-          time: roomData.time,
-        });
+        setRoomData(roomData);
       }
     });
 
@@ -87,9 +84,7 @@ export default function Page({
       setConnectedSockets(count);
     };
 
-    const handleUsersInRoom = (
-      users: { id: string; status: "active" | "inactive" }[],
-    ) => {
+    const handleUsersInRoom = (users: TypeUser[]) => {
       setRoomData((prev) => {
         if (prev) {
           return { ...prev, users: users };
@@ -110,8 +105,10 @@ export default function Page({
     socket.on("noOfUsersInRoom", handleNoOfUsersInRoom);
     socket.on("usersInRoom", handleUsersInRoom);
     socket.on("leaveRoom", handleLeaveRoom);
+
+    socket.once("gameLetsbegin", handleLetsbegin);
+
     const activity = setInterval(() => {
-      console.log("Checking activity");
       socket.emit("noOfUsersInRoom", slug);
       socket.emit("usersInRoom", slug);
       setStatus(socket?.connected);
@@ -121,9 +118,10 @@ export default function Page({
       clearInterval(activity);
       socket.off("noOfUsersInRoom");
       socket.off("message");
-      socket.off("noOfUsersInRoom", handleNoOfUsersInRoom);
-      socket.off("usersInRoom", handleUsersInRoom);
-      socket.off("leaveRoom", handleLeaveRoom);
+      socket.off("noOfUsersInRoom");
+      socket.off("usersInRoom");
+      socket.off("leaveRoom");
+      socket.off("gameLetsbegin");
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket]);
@@ -137,6 +135,10 @@ export default function Page({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, [start]);
 
   const [copied, setCopied] = useState(false);
 
@@ -161,6 +163,58 @@ export default function Page({
     redirect("/multiplayer");
   }
 
+  const handleLetsbegin = () => {
+    setletsgo((v) => !v);
+    const sss = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev === 3) {
+          clearInterval(sss); // Stop the interval after 3 executions
+          setStart(true);
+          return prev; // Prevents further updates
+        }
+        if (!prev) return 1;
+        return prev + 1;
+      });
+    }, 1000);
+  };
+
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newText = e.target.value;
+    setInputText(newText);
+
+    // if (!isStarted && newText.length === 1) {
+    //   switchMode("typing");
+    //   setIsStarted(true);
+    //   setStartTime(Date.now());
+    // }
+
+    // const newStats = calculateStats(newText, text, timeUsed || 1);
+    // setStats(newStats);
+
+    // //it will kill the Interval when the text is equal to the target text
+    // if (newText.length >= text.length) {
+    //   clearInterval(timerRef.current);
+    // }
+    // if (inputText.length + 1 === text.length) {
+    //   switchMode("result");
+    // }
+  };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" || e.key === "Delete") {
+      e.preventDefault(); // Block backspace and delete
+    }
+    if (inputText.length === 0 && e.key === " ") {
+      e.preventDefault();
+    }
+
+    if (roomData?.text.charAt(inputText.length) === " " && e.key === " ") {
+      return;
+    }
+    if (inputText.charAt(inputText.length - 2) === " " && e.key === " ") {
+      e.preventDefault();
+    }
+  };
+
   return (
     <main className="p-4 sm:p-6 md:p-8">
       <motion.div className="mx-auto max-w-6xl">
@@ -174,41 +228,46 @@ export default function Page({
               <span className="font-normal text-black dark:text-white">🏁</span>{" "}
               Race Room | {roomData?.text?.length}Char {roomData?.time}s
             </h1>
-            <div className="flex items-center justify-center gap-2 rounded-lg bg-zinc-800/50 p-2 text-zinc-400">
-              {socket?.connected ? (
-                <span className="relative flex size-3">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75"></span>
-                  <span className="relative inline-flex size-3 rounded-full bg-sky-500"></span>
-                </span>
-              ) : (
-                <span className="relative flex size-3">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                  <span className="relative inline-flex size-3 rounded-full bg-red-500"></span>
-                </span>
-              )}
-              <p className="text-sm font-medium md:text-base">
-                Room Code: {roomData?.roomCode}
-              </p>
-
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 hover:bg-zinc-700/50"
-                onClick={copyToClipboard}
-              >
-                {copied ? (
-                  <Check className="h-4 w-4 text-teal-500" />
+            {!letsgo && (
+              <div className="flex items-center justify-center gap-2 rounded-lg bg-zinc-800/50 p-2 text-zinc-400">
+                {socket?.connected ? (
+                  <span className="relative flex size-3">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75"></span>
+                    <span className="relative inline-flex size-3 rounded-full bg-sky-500"></span>
+                  </span>
                 ) : (
-                  <Copy className="h-4 w-4" />
+                  <span className="relative flex size-3">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex size-3 rounded-full bg-red-500"></span>
+                  </span>
                 )}
-              </Button>
-            </div>
+                <p className="text-sm font-medium md:text-base">
+                  Room Code: {roomData?.roomCode}
+                </p>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 hover:bg-zinc-700/50"
+                  onClick={copyToClipboard}
+                >
+                  {copied ? (
+                    <Check className="h-4 w-4 text-teal-500" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            )}
           </div>
+
           <div className="flex space-x-3">
-            {socket?.id === roomData?.author && (
+            {socket?.id === roomData?.author && !letsgo && (
               <Button
                 className="w-full bg-gradient-to-r from-teal-500 to-blue-600 font-bold shadow-lg transition-all hover:from-blue-600 hover:to-teal-700 hover:text-zinc-100 hover:shadow-teal-500/20 sm:w-auto"
-                onClick={() => setletsgo((v) => !v)}
+                onClick={() => {
+                  socket.emit("gameLetsbegin", slug);
+                }}
               >
                 <Timer strokeWidth={3} className="mr-1 h-4 w-4" />
                 Start Race
@@ -227,7 +286,7 @@ export default function Page({
             </Button>
           </div>
         </motion.div>
-
+        <hr className="my-6 h-px border-t-0 bg-transparent bg-gradient-to-r from-transparent via-zinc-600 to-transparent dark:via-zinc-600" />
         {/* Main Content */}
         {!letsgo && (
           <motion.div
@@ -250,10 +309,41 @@ export default function Page({
         )}
         {letsgo && (
           <div>
-            <div>Letssee</div>
-            <div>
-              <ShowText text={roomData?.text || ""} />
+            <div className="relative flex items-center justify-center">
+              <ShowText
+                text={roomData?.text || ""}
+                inputText={start ? inputText : undefined}
+              />
+              {start && (
+                <input
+                  ref={inputRef}
+                  value={inputText}
+                  type="text"
+                  placeholder="Start typing..."
+                  onChange={handleInput}
+                  className="absolute inset-0 h-full w-full cursor-default resize-none opacity-0 focus:outline-none"
+                  onKeyDown={handleKeyDown} // Prevents Backspace
+                />
+              )}
+              {countdown !== 0 && !start && (
+                <span className="absolute inline-flex animate-ping rounded-full bg-sky-400 text-6xl font-bold opacity-75">
+                  {countdown}
+                </span>
+              )}
             </div>
+            <Card className="border-zinc-800/50 bg-zinc-900/50 p-4 shadow-xl backdrop-blur-sm">
+              {roomData?.users.map((user, i) => {
+                return user.status === "active" ? (
+                  <Pck
+                    value={user.inputLength || 0.1}
+                    user={{ id: user.id }}
+                    key={i}
+                  />
+                ) : (
+                  <div className="hidden" key={i}></div>
+                );
+              })}
+            </Card>
           </div>
         )}
       </motion.div>

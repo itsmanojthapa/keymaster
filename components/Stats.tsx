@@ -1,8 +1,8 @@
-import { TypingStats } from "@/types/types";
+import { TypeTypingStats } from "@/types/types";
 import React from "react";
 import Timer from "./Timer";
 
-const Stats = ({ stats, time }: { stats: TypingStats; time: number }) => {
+const Stats = ({ stats, time }: { stats: TypeTypingStats; time: number }) => {
   return (
     <div className="mb-3 mt-3 flex flex-col space-x-5 text-center font-mono text-lg">
       <div>

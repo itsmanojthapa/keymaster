@@ -14,6 +14,7 @@ const onConnection = (io: Server, socket: Socket) => {
     handleCreateRoom,
     handleJoinRoom,
     handleUsersInRoom,
+    handleLetsbegin,
     handleNoOfUsersInRoom,
     handleLeaveRoom,
     handleDisconnect,
@@ -27,6 +28,12 @@ const onConnection = (io: Server, socket: Socket) => {
   socket.on("leaveRoom", handleLeaveRoom);
   socket.on("noOfUsersInRoom", handleNoOfUsersInRoom);
   socket.on("usersInRoom", handleUsersInRoom);
+
+  socket.on("gameLetsbegin", handleLetsbegin);
+  socket.on("gameStart", handleUsersInRoom);
+  socket.on("gameTyping", handleUsersInRoom);
+  socket.on("gameResult", handleUsersInRoom);
+
   socket.on("disconnect", handleDisconnect);
 };
 

@@ -9,7 +9,7 @@ import { LoaderCircle, LogIn, Plus } from "lucide-react";
 import CustomText from "@/components/CustomText";
 import Control from "@/components/Control";
 import { Spec } from "@/components/spec";
-import { TimeOption } from "@/types/types";
+import { TypeTimeOption } from "@/types/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { redirect, useRouter } from "next/navigation";
 
@@ -23,7 +23,7 @@ const Multiplayer = () => {
 
   const [jRoom, setJRoom] = useState("");
 
-  const [selectedTime, setSelectedTime] = useState<TimeOption>(15);
+  const [selectedTime, setSelectedTime] = useState<TypeTimeOption>(15);
   const [text, setText] = useState(data[0]);
   const [customTextDiv, setCustomTextDiv] = useState(false);
   const [clickedJ, setClickedJ] = useState(false);
@@ -37,12 +37,14 @@ const Multiplayer = () => {
     socket.on("joinRoom", (msg: string, error) => {
       if (error) {
         setClickedJ(false);
+        toast({ variant: "destructive", title: `ERROR: ${msg}` });
         disSocket();
-        return toast({ variant: "destructive", title: `ERROR: ${msg}` });
+        return;
       }
       toast({ title: msg });
       router.push(`/multiplayer/room/${jRoom}`);
     });
+
     if (socket) {
       jRoom.trim();
       socket.emit("joinRoom", jRoom);
@@ -55,6 +57,7 @@ const Multiplayer = () => {
   const handleCRoom = () => {
     setClickedC(true);
     const socket = initSocket();
+
     socket.on("createRoom", (roomName: string) => {
       socket.emit("joinRoom", roomName);
       toast({ title: `Room created: ID ${roomName}` });

@@ -129,3 +129,17 @@ body {
   height: calc(100vh - 20px);
   background-color: #f3f4f6; /* Tailwind equivalent of bg-gray-200 */
 }
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: none;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #24ad9a;
+  border-radius: 4px;
+}
