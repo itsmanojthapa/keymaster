@@ -9,7 +9,6 @@ import {
   roomsTimeout,
   roomsTimeoutTime,
 } from "./roomUtils";
-import { TypeRoom } from "@/types/types";
 
 const eventHandlers = (io: Server, socket: Socket) => {
   const handleCreateRoom = (text: string, time: number) => {
@@ -32,6 +31,7 @@ const eventHandlers = (io: Server, socket: Socket) => {
       roomCode: roomCode,
       author: socket.id,
       gameStarted: false,
+      gameEnded: false,
       text: text,
       users: [
         { id: socket.id, status: "active", inputLength: 0, inputText: "" },
@@ -166,9 +166,52 @@ const eventHandlers = (io: Server, socket: Socket) => {
       return;
     }
     room.gameStarted = true;
-    console.log("GameStarted: ", room.gameStarted);
-
     io.to(roomCode).emit("gameLetsbegin", "Game is starting");
+    // Stop listening to typing after game duration ends
+    setTimeout(
+      () => {
+        room.gameEnded = true;
+        io.to(roomCode).emit("gameEnd");
+
+        // Show results after game ends
+        setTimeout(() => {
+          const room = findRoom(roomCode);
+          io.to(roomCode).emit("showResults", {
+            message: "Game Over! Showing results...",
+            roomData: room,
+          });
+
+          // Finally, remove users from the room after resultDuration
+          setTimeout(() => {
+            io.to(roomCode).emit("leaveRoom", "Session completed");
+            io.socketsLeave(roomCode);
+            //store room data in cloud db
+            deleteRoom(roomCode); // Cleanup room data
+          }, 1000 * 10);
+        }, 1000); // Small delay before showing results
+      },
+      1000 * (room.time + 3),
+    );
+  };
+
+  const handleTyping = (roomCode: string, inputLength: number) => {
+    const room = findRoom(roomCode);
+    if (!room) {
+      io.to(roomCode).emit("leaveRoom", "Something went wrong");
+      io.socketsLeave(roomCode);
+      return;
+    }
+    if (room.gameEnded) return;
+    if (!room.gameStarted) {
+      return;
+    }
+
+    const user = room.users.find((user) => user.id === socket.id);
+    if (user) {
+      user.inputLength = inputLength;
+    }
+
+    io.to(roomCode).emit("gameTyping", socket.id, inputLength);
   };
 
   const handleDisconnect = () => {
@@ -224,6 +267,7 @@ const eventHandlers = (io: Server, socket: Socket) => {
     handleLetsbegin,
     handleNoOfUsersInRoom,
     handleLeaveRoom,
+    handleTyping,
     handleDisconnect,
   };
 };

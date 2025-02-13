@@ -13,7 +13,7 @@ import { redirect } from "next/navigation";
 import ShowText from "@/components/ShowText";
 import { Card } from "@/components/ui/card";
 import Pck from "@/components/Pck";
-import { TypeRoom, TypeUser } from "@/types/types";
+import { TypeRoom, TypeTypingStats, TypeUser } from "@/types/types";
 
 export default function Page({
   params,
@@ -55,13 +55,6 @@ export default function Page({
       redirect("/multiplayer");
     }
 
-    socket.once("init", (roomData: TypeRoom) => {
-      if (roomData) {
-        setMessages(roomData?.messages || []);
-        setRoomData(roomData);
-      }
-    });
-
     const handleRoomExists = (exists: string) => {
       if (exists === "false") {
         setTimeout(() => {
@@ -70,6 +63,16 @@ export default function Page({
         redirect("/multiplayer");
       }
     };
+    socket.once("init", (roomData: TypeRoom) => {
+      if (roomData) {
+        setMessages(roomData?.messages || []);
+        setRoomData(roomData);
+      }
+    });
+
+    socket.once("gameEnd", () => {
+      toast({ title: "Game Over! Showing results soon..." });
+    });
 
     socket.once("roomExists", handleRoomExists);
 
@@ -163,6 +166,37 @@ export default function Page({
     redirect("/multiplayer");
   }
 
+  const startTyping = () => {
+    socket.on("gameTyping", (id: string, inputLength: number) => {
+      setRoomData((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          users: prev.users.map((user) => {
+            if (user.id === id) {
+              user.inputLength = inputLength;
+            }
+            return user;
+          }),
+        };
+      });
+    });
+    socket.once("gameResult", (id: string, resultData: TypeTypingStats) => {
+      setRoomData((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          users: prev.users.map((user) => {
+            if (user.id === id) {
+              user.resultData = resultData;
+            }
+            return user;
+          }),
+        };
+      });
+    });
+  };
+
   const handleLetsbegin = () => {
     setletsgo((v) => !v);
     const sss = setInterval(() => {
@@ -170,6 +204,7 @@ export default function Page({
         if (prev === 3) {
           clearInterval(sss); // Stop the interval after 3 executions
           setStart(true);
+          startTyping();
           return prev; // Prevents further updates
         }
         if (!prev) return 1;
@@ -181,7 +216,7 @@ export default function Page({
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newText = e.target.value;
     setInputText(newText);
-
+    socket?.emit("gameTyping", roomData?.roomCode, newText.length);
     // if (!isStarted && newText.length === 1) {
     //   switchMode("typing");
     //   setIsStarted(true);
@@ -335,7 +370,13 @@ export default function Page({
               {roomData?.users.map((user, i) => {
                 return user.status === "active" ? (
                   <Pck
-                    value={user.inputLength || 0.1}
+                    value={
+                      user.id === socket.id
+                        ? perLength(inputText.length, roomData.text.length) ||
+                          0.1
+                        : perLength(user.inputLength, roomData.text.length) ||
+                          0.1
+                    }
                     user={{ id: user.id }}
                     key={i}
                   />
@@ -349,4 +390,8 @@ export default function Page({
       </motion.div>
     </main>
   );
+}
+
+function perLength(inputLength: number, textLength: number) {
+  return Math.floor((inputLength / textLength) * 100);
 }

@@ -17,6 +17,7 @@ const onConnection = (io: Server, socket: Socket) => {
     handleLetsbegin,
     handleNoOfUsersInRoom,
     handleLeaveRoom,
+    handleTyping,
     handleDisconnect,
   } = eventHandlers(io, socket);
 
@@ -30,9 +31,8 @@ const onConnection = (io: Server, socket: Socket) => {
   socket.on("usersInRoom", handleUsersInRoom);
 
   socket.on("gameLetsbegin", handleLetsbegin);
-  socket.on("gameStart", handleUsersInRoom);
-  socket.on("gameTyping", handleUsersInRoom);
-  socket.on("gameResult", handleUsersInRoom);
+  socket.on("gameTyping", handleTyping);
+  // socket.on("gameResult", handleResult);
 
   socket.on("disconnect", handleDisconnect);
 };

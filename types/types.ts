@@ -19,6 +19,7 @@ interface TypeRoom {
   roomCode: string;
   author: string;
   gameStarted: boolean;
+  gameEnded: boolean;
   text: string;
   users: TypeUser[];
   time: number;

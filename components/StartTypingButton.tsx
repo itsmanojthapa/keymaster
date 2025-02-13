@@ -13,7 +13,7 @@ const StartTypingButton = () => {
         "hover:shadow-zinc-900/20 active:scale-100",
         "before:absolute before:inset-0 before:rounded-xl",
         "before:animate-pulse before:bg-zinc-600/20",
-        "absolute bottom-1/4 left-1/2 z-10 -translate-x-1/2 text-teal-400",
+        "absolute left-1/2 top-0 z-10 -translate-x-1/2 text-teal-400",
       )}
     >
       <Image
