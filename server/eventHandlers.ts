@@ -9,6 +9,7 @@ import {
   roomsTimeout,
   roomsTimeoutTime,
 } from "./roomUtils";
+import { calculateStats } from "../lib/CalculateStats";
 
 const eventHandlers = (io: Server, socket: Socket) => {
   const handleCreateRoom = (text: string, time: number) => {
@@ -25,12 +26,12 @@ const eventHandlers = (io: Server, socket: Socket) => {
         }, roomsTimeoutTime),
       });
     }
-    console.log(text, time);
 
     db.push({
       roomCode: roomCode,
       author: socket.id,
       gameStarted: false,
+      gameStartedTime: null,
       gameEnded: false,
       text: text,
       users: [
@@ -40,15 +41,6 @@ const eventHandlers = (io: Server, socket: Socket) => {
       date: new Date(),
       messages: [],
     });
-    console.log(`${socket.id} created and joined room: ${roomCode}`);
-    console.log(
-      db.forEach((room) => {
-        if (room.roomCode === roomCode) {
-          console.log(room);
-          return;
-        }
-      }),
-    );
     socket.emit("createRoom", roomCode);
     io.to(roomCode).emit(
       "noOfUsersInRoom",
@@ -77,12 +69,9 @@ const eventHandlers = (io: Server, socket: Socket) => {
       }
 
       if (room.gameStarted) {
-        console.log("Game already started");
         socket.emit("joinRoom", "Game already started", "error");
         return;
       }
-
-      console.log("GameStartedJOIN: ", room.gameStarted);
 
       const user = userExistsInRoom(roomCode, socket.id);
       if (!user) {
@@ -97,8 +86,6 @@ const eventHandlers = (io: Server, socket: Socket) => {
       socket.join(roomCode);
 
       io.to(roomCode).emit("init", findRoom(roomCode));
-
-      console.log(`${socket.id} joined room: ${roomCode}`);
 
       io.to(roomCode).emit("usersInRoom", room?.users);
 
@@ -131,7 +118,6 @@ const eventHandlers = (io: Server, socket: Socket) => {
 
     socket.leave(roomCode);
     deleteUserRoom(roomCode, socket.id);
-    console.log(`${socket.id} left room: ${roomCode}`);
 
     io.to(roomCode).emit(
       "noOfUsersInRoom",
@@ -149,7 +135,6 @@ const eventHandlers = (io: Server, socket: Socket) => {
     const room = findRoom(roomCode);
     if (!room) return;
     room.messages.push(msg);
-    console.log(`Message in room ${roomCode}: ${msg}`);
     io.to(roomCode).emit("message", msg);
   };
 
@@ -166,6 +151,9 @@ const eventHandlers = (io: Server, socket: Socket) => {
       return;
     }
     room.gameStarted = true;
+    // Start game after 3 seconds
+    room.gameStartedTime = new Date(Date.now() + 3 * 1000);
+
     io.to(roomCode).emit("gameLetsbegin", "Game is starting");
     // Stop listening to typing after game duration ends
     setTimeout(
@@ -176,10 +164,15 @@ const eventHandlers = (io: Server, socket: Socket) => {
         // Show results after game ends
         setTimeout(() => {
           const room = findRoom(roomCode);
-          io.to(roomCode).emit("showResults", {
-            message: "Game Over! Showing results...",
-            roomData: room,
+          room?.users.map((user) => {
+            const stats = calculateStats(
+              user.inputText,
+              room?.text,
+              user?.timetaken || room.time * 1000,
+            );
+            user.resultData = stats;
           });
+          io.to(roomCode).emit("gameResult", room?.users);
 
           // Finally, remove users from the room after resultDuration
           setTimeout(() => {
@@ -187,14 +180,18 @@ const eventHandlers = (io: Server, socket: Socket) => {
             io.socketsLeave(roomCode);
             //store room data in cloud db
             deleteRoom(roomCode); // Cleanup room data
-          }, 1000 * 10);
+          }, 1000 * 30);
         }, 1000); // Small delay before showing results
       },
       1000 * (room.time + 3),
     );
   };
 
-  const handleTyping = (roomCode: string, inputLength: number) => {
+  const handleTyping = (
+    roomCode: string,
+    inputLength: number,
+    inputText: string,
+  ) => {
     const room = findRoom(roomCode);
     if (!room) {
       io.to(roomCode).emit("leaveRoom", "Something went wrong");
@@ -209,16 +206,16 @@ const eventHandlers = (io: Server, socket: Socket) => {
     const user = room.users.find((user) => user.id === socket.id);
     if (user) {
       user.inputLength = inputLength;
+      user.inputText = inputText;
+      if (room.text.length === inputLength) {
+        user.timetaken = Date.now() - room.gameStartedTime!.getTime();
+      }
     }
 
     io.to(roomCode).emit("gameTyping", socket.id, inputLength);
   };
 
   const handleDisconnect = () => {
-    console.log(
-      `Disconnected Client ID: ${socket.id} | Total clients: ${io.engine.clientsCount}`,
-    );
-
     db.forEach((room) => {
       let i = false;
       room.users.forEach((user) => {
@@ -253,7 +250,6 @@ const eventHandlers = (io: Server, socket: Socket) => {
       io.to(roomCode).emit("leaveRoom", "Time Out"); // Notify clients
       io.socketsLeave(roomCode); // Force users to leave the room
       deleteRoom(roomCode); // Delete room from db
-      console.log(`Room ${roomCode} destroyed.`);
     }
   }
 

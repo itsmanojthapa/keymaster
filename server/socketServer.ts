@@ -32,7 +32,6 @@ const onConnection = (io: Server, socket: Socket) => {
 
   socket.on("gameLetsbegin", handleLetsbegin);
   socket.on("gameTyping", handleTyping);
-  // socket.on("gameResult", handleResult);
 
   socket.on("disconnect", handleDisconnect);
 };

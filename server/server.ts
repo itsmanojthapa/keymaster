@@ -2,6 +2,8 @@ import { createServer } from "node:http";
 import next from "next";
 // import { Server } from "socket.io";
 import { initSocket } from "./socketServer";
+import { db } from "./roomUtils";
+import fs from "fs";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
@@ -14,6 +16,7 @@ app.prepare().then(() => {
   const httpServer = createServer(handler);
   initSocket(httpServer);
 
+  // setInterval(writeToFile, 3000); //Testing
   httpServer
     .once("error", (err) => {
       console.error(err);
@@ -23,3 +26,10 @@ app.prepare().then(() => {
       console.log(`> Ready on http://${hostname}:${port}`);
     });
 });
+
+//write db to file every 3 seconds
+const writeToFile = () => {
+  fs.writeFile("output.json", JSON.stringify(db, null, 2), (err) => {
+    if (err) console.error("Error writing file:", err);
+  });
+};

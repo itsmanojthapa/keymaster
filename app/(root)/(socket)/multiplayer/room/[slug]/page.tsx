@@ -14,12 +14,17 @@ import ShowText from "@/components/ShowText";
 import { Card } from "@/components/ui/card";
 import Pck from "@/components/Pck";
 import { TypeRoom, TypeTypingStats, TypeUser } from "@/types/types";
+import { calculateStats } from "@/lib/CalculateStats";
+import Stats from "@/components/Stats";
+import Pcr from "@/components/Pcr";
 
 export default function Page({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  const timerRef = useRef<number>();
+
   const { slug } = React.use(params);
   const [letsgo, setletsgo] = useState<boolean>(false);
   const socket = getSocket();
@@ -27,14 +32,23 @@ export default function Page({
   const [messages, setMessages] = useState<string[]>([]);
   const [connectedSockets, setConnectedSockets] = useState(0);
   const [status, setStatus] = useState(true);
+  const [stats, setStats] = useState<TypeTypingStats>({
+    wpm: 0,
+    accuracy: 0,
+    correct: 0,
+    wrong: 0,
+  });
+
   const [roomData, setRoomData] = useState<TypeRoom | null>();
+  const [result, setResult] = useState<TypeUser[] | null>();
 
   const [inputText, setInputText] = useState("");
+  const [timeUsed, setTimeUsed] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [countdown, setCountdown] = useState<number | false>(false);
   const [start, setStart] = useState<boolean>(false);
-  // const [result, setResult] = useState<TypeTypingStats | null>(null);
+  const [startTime, setStartTime] = useState(0);
 
   // Authentication check (replace with actual logic)
   function auth() {
@@ -70,11 +84,15 @@ export default function Page({
       }
     });
 
+    socket.once("roomExists", handleRoomExists);
     socket.once("gameEnd", () => {
+      setStart(false);
       toast({ title: "Game Over! Showing results soon..." });
     });
-
-    socket.once("roomExists", handleRoomExists);
+    socket.once("gameResult", (users) => {
+      toast({ title: "Result" });
+      setResult(users);
+    });
 
     socket.emit("roomExists", slug);
     socket.emit("joinRoom", slug);
@@ -128,6 +146,29 @@ export default function Page({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket]);
+
+  useEffect(() => {
+    if (start) {
+      timerRef.current = window.setInterval(() => {
+        setTimeUsed((time) => time + 1000);
+        if (!start) {
+          clearInterval(timerRef.current);
+        }
+      }, 1000);
+    }
+    return () => clearInterval(timerRef.current);
+  }, [start, startTime]);
+
+  useEffect(() => {
+    if (start) {
+      const newStats = calculateStats(
+        inputText,
+        roomData?.text || " ",
+        timeUsed,
+      );
+      setStats(newStats);
+    }
+  }, [timeUsed, inputText, start, roomData?.text]);
 
   useEffect(() => {
     return () => {
@@ -199,11 +240,14 @@ export default function Page({
 
   const handleLetsbegin = () => {
     setletsgo((v) => !v);
+    setCountdown(1);
     const sss = setInterval(() => {
       setCountdown((prev) => {
         if (prev === 3) {
+          setCountdown(0);
           clearInterval(sss); // Stop the interval after 3 executions
           setStart(true);
+          setStartTime(Date.now() + 1000);
           startTyping();
           return prev; // Prevents further updates
         }
@@ -216,23 +260,13 @@ export default function Page({
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newText = e.target.value;
     setInputText(newText);
-    socket?.emit("gameTyping", roomData?.roomCode, newText.length);
-    // if (!isStarted && newText.length === 1) {
-    //   switchMode("typing");
-    //   setIsStarted(true);
-    //   setStartTime(Date.now());
-    // }
-
-    // const newStats = calculateStats(newText, text, timeUsed || 1);
-    // setStats(newStats);
-
-    // //it will kill the Interval when the text is equal to the target text
-    // if (newText.length >= text.length) {
-    //   clearInterval(timerRef.current);
-    // }
-    // if (inputText.length + 1 === text.length) {
-    //   switchMode("result");
-    // }
+    socket?.emit("gameTyping", roomData?.roomCode, newText.length, newText);
+    const newStats = calculateStats(
+      newText,
+      roomData?.text || "",
+      timeUsed || 1,
+    );
+    setStats(newStats);
   };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Backspace" || e.key === "Delete") {
@@ -342,8 +376,9 @@ export default function Page({
             />
           </motion.div>
         )}
-        {letsgo && (
+        {letsgo && !result ? (
           <div>
+            <Stats stats={stats} time={timeUsed} />
             <div className="relative flex items-center justify-center">
               <ShowText
                 text={roomData?.text || ""}
@@ -360,7 +395,7 @@ export default function Page({
                   onKeyDown={handleKeyDown} // Prevents Backspace
                 />
               )}
-              {countdown !== 0 && !start && (
+              {countdown !== 0 && (
                 <span className="absolute inline-flex animate-ping rounded-full bg-sky-400 text-6xl font-bold opacity-75">
                   {countdown}
                 </span>
@@ -386,6 +421,22 @@ export default function Page({
               })}
             </Card>
           </div>
+        ) : (
+          <>
+            <Card className="w-fit border-zinc-800/50 bg-zinc-900/50 p-4 shadow-xl backdrop-blur-sm">
+              {result?.map((user, i) => {
+                return user.status === "active" ? (
+                  <Pcr
+                    user={user}
+                    key={i}
+                    time={roomData?.time ? roomData?.time * 1000 : 0}
+                  />
+                ) : (
+                  <div className="hidden" key={i}></div>
+                );
+              })}
+            </Card>
+          </>
         )}
       </motion.div>
     </main>

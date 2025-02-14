@@ -11,6 +11,7 @@ type TypeUser = {
   id: string;
   status: "active" | "inactive";
   inputText: string;
+  timetaken?: number;
   inputLength: number;
   resultData?: TypeTypingStats;
 };
@@ -19,6 +20,7 @@ interface TypeRoom {
   roomCode: string;
   author: string;
   gameStarted: boolean;
+  gameStartedTime: Date | null;
   gameEnded: boolean;
   text: string;
   users: TypeUser[];
