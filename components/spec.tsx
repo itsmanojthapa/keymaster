@@ -1,13 +1,13 @@
 import { Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { TimeOption } from "@/types/types";
+import { TypeTimeOption } from "@/types/types";
 
 export function Spec({
   selectedTime,
   setSelectedTime,
 }: {
-  selectedTime: TimeOption;
-  setSelectedTime: (time: TimeOption) => void;
+  selectedTime: TypeTimeOption;
+  setSelectedTime: (time: TypeTimeOption) => void;
 }) {
   return (
     <div>
@@ -31,7 +31,7 @@ export function Spec({
             {[15, 30, 60, 120].map((time) => (
               <button
                 key={time}
-                onClick={() => setSelectedTime(time as TimeOption)}
+                onClick={() => setSelectedTime(time as TypeTimeOption)}
                 className={cn(
                   "rounded-full px-3 py-2 text-sm font-medium transition-colors duration-200 hover:scale-105",
                   selectedTime === time

@@ -3,7 +3,7 @@ import textLength from "./textLength";
 export function calculateStats(
   inputText: string,
   text: string,
-  timeUsed: number
+  timeUsed: number,
 ) {
   let accurateWord = 0;
   let wrongWord = 0;
@@ -41,16 +41,6 @@ export function calculateStats(
   // Calculate Accuracy (Safe Calculation)
   const accuracy =
     totalChars > 0 ? Math.round((accurateWord / totalChars) * 100) : 0;
-
-  // console.log({
-  //   totalChars,
-  //   accurateWord,
-  //   timeUsed,
-  //   minutes,
-  //   safeMinutes,
-  //   wpm,
-  //   accuracy,
-  // });
 
   return {
     wpm: wpm,

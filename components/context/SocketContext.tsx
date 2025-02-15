@@ -13,7 +13,6 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     const setupSocket = async () => {
       const sock = await initSocket();
       setSocket(sock);
-      console.log("Socket initialized:", sock); // Debug log
     };
 
     setupSocket();

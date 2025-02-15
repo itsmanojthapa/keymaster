@@ -3,10 +3,6 @@ import { Server, Socket } from "socket.io";
 import eventHandlers from "./eventHandlers";
 
 const onConnection = (io: Server, socket: Socket) => {
-  console.log(
-    `Client connected ID: ${socket.id} | Total clients: ${io.engine.clientsCount}`,
-  );
-
   const {
     handleInit,
     handleRoomExists,

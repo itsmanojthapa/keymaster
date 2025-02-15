@@ -123,6 +123,24 @@ export default function Page({
       redirect("/multiplayer");
     };
 
+    const handleLetsbegin = () => {
+      setletsgo((v) => !v);
+      setCountdown(1);
+      const sss = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev === 3) {
+            clearInterval(sss); // Stop the interval after 3 executions
+            setStart(true);
+            setStartTime(Date.now() + 1000);
+            startTyping();
+            return 0; // Prevents further updates
+          }
+          if (!prev) return 1;
+          return prev + 1;
+        });
+      }, 1000);
+    };
+
     socket.on("noOfUsersInRoom", handleNoOfUsersInRoom);
     socket.on("usersInRoom", handleUsersInRoom);
     socket.on("leaveRoom", handleLeaveRoom);
@@ -236,25 +254,6 @@ export default function Page({
         };
       });
     });
-  };
-
-  const handleLetsbegin = () => {
-    setletsgo((v) => !v);
-    setCountdown(1);
-    const sss = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev === 3) {
-          setCountdown(0);
-          clearInterval(sss); // Stop the interval after 3 executions
-          setStart(true);
-          setStartTime(Date.now() + 1000);
-          startTyping();
-          return prev; // Prevents further updates
-        }
-        if (!prev) return 1;
-        return prev + 1;
-      });
-    }, 1000);
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {

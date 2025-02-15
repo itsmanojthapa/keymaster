@@ -158,30 +158,32 @@ const eventHandlers = (io: Server, socket: Socket) => {
     // Stop listening to typing after game duration ends
     setTimeout(
       () => {
+        const room = findRoom(roomCode);
+        if (!room) {
+          io.to(roomCode).emit("leaveRoom", "Something went wrong");
+          io.socketsLeave(roomCode);
+          return;
+        }
         room.gameEnded = true;
         io.to(roomCode).emit("gameEnd");
 
-        // Show results after game ends
-        setTimeout(() => {
-          const room = findRoom(roomCode);
-          room?.users.map((user) => {
-            const stats = calculateStats(
-              user.inputText,
-              room?.text,
-              user?.timetaken || room.time * 1000,
-            );
-            user.resultData = stats;
-          });
-          io.to(roomCode).emit("gameResult", room?.users);
+        room?.users.map((user) => {
+          const stats = calculateStats(
+            user.inputText,
+            room?.text,
+            user?.timetaken || room.time * 1000,
+          );
+          user.resultData = stats;
+        });
+        io.to(roomCode).emit("gameResult", room?.users);
 
-          // Finally, remove users from the room after resultDuration
-          setTimeout(() => {
-            io.to(roomCode).emit("leaveRoom", "Session completed");
-            io.socketsLeave(roomCode);
-            //store room data in cloud db
-            deleteRoom(roomCode); // Cleanup room data
-          }, 1000 * 30);
-        }, 1000); // Small delay before showing results
+        // Finally, remove users from the room after resultDuration
+        setTimeout(() => {
+          io.to(roomCode).emit("leaveRoom", "Session completed");
+          io.socketsLeave(roomCode);
+          //store room data in cloud db
+          deleteRoom(roomCode); // Cleanup room data
+        }, 1000 * 30);
       },
       1000 * (room.time + 3),
     );

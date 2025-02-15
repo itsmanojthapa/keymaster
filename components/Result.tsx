@@ -24,7 +24,6 @@ export function Result({
       color: "hsl(var(--chart-2))",
     },
   } satisfies ChartConfig;
-  // console.log(arrWps);
 
   return (
     <Card className="dark mt-3">

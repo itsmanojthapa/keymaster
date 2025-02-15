@@ -12,7 +12,6 @@ export const deleteRoom = (roomCode: string) => {
   const index = db.findIndex((room) => room.roomCode === roomCode);
   if (index !== -1) {
     db.splice(index, 1);
-    console.log(`Room ${roomCode} deleted`);
   }
 };
 
@@ -26,16 +25,13 @@ export const userExistsInRoom = (roomCode: string, userId: string) => {
 export const deleteUserRoom = (roomCode: string, userId: string) => {
   const room = findRoom(roomCode);
   if (!room) {
-    console.log(`Room ${roomCode} not found`);
     return;
   }
 
   const user = room.users.find((user) => user.id === userId);
   if (user) {
     user.status = "inactive";
-    console.log(`User ${userId} inactive in #${roomCode} Room`);
   } else {
-    console.log(`User ${userId} not found in #${roomCode} Room`);
   }
 };
 
