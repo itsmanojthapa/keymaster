@@ -131,9 +131,10 @@ export default function Page({
           if (prev === 3) {
             clearInterval(sss); // Stop the interval after 3 executions
             setStart(true);
+            setIsFocused(true);
             setStartTime(Date.now() + 1000);
             startTyping();
-            return 0; // Prevents further updates
+            return prev + 1; // Prevents further updates
           }
           if (!prev) return 1;
           return prev + 1;
@@ -211,6 +212,26 @@ export default function Page({
     toast({ title: "Room code copied to clipboard!" });
     setTimeout(() => setCopied(false), 100);
   };
+  const [isFocused, setIsFocused] = useState(false);
+
+  useEffect(() => {
+    const handleFocus = () => {
+      setIsFocused(true);
+    };
+    const handleBlur = () => setIsFocused(false);
+
+    const inputElement = inputRef.current;
+    if (inputElement) {
+      inputElement.addEventListener("focus", handleFocus);
+      inputElement.addEventListener("blur", handleBlur);
+    }
+    return () => {
+      if (inputElement) {
+        inputElement.removeEventListener("focus", handleFocus);
+        inputElement.removeEventListener("blur", handleBlur);
+      }
+    };
+  }, [inputRef, start]);
 
   if (!socket || !slug) {
     return (
@@ -382,6 +403,7 @@ export default function Page({
               <ShowText
                 text={roomData?.text || ""}
                 inputText={start ? inputText : undefined}
+                isFocused={isFocused}
               />
               {start && (
                 <input
@@ -394,7 +416,7 @@ export default function Page({
                   onKeyDown={handleKeyDown} // Prevents Backspace
                 />
               )}
-              {countdown !== 0 && (
+              {countdown && countdown < 4 && (
                 <span className="absolute inline-flex animate-ping rounded-full bg-sky-400 text-6xl font-bold opacity-75">
                   {countdown}
                 </span>

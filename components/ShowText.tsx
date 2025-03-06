@@ -5,9 +5,11 @@ import { motionSet } from "@/lib/motionSet";
 const ShowText = ({
   inputText,
   text,
+  isFocused,
 }: {
   inputText?: string;
   text: string;
+  isFocused?: boolean;
 }) => {
   return (
     <motion.div
@@ -49,7 +51,7 @@ const ShowText = ({
                 return (
                   <span
                     key={i}
-                    className={`border-l-2 border-transparent ${word === " " && "w-3"} ${i === inputText?.length && "animate-blink border-teal-500"} ${
+                    className={`border-l-2 border-transparent ${word === " " && "w-3"} ${i === inputText?.length && isFocused ? "animate-blink border-teal-500" : ""} ${
                       isMatch
                         ? "text-teal-500"
                         : i < (inputText?.length ?? 0)

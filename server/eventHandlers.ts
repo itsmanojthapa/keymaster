@@ -225,6 +225,7 @@ const eventHandlers = (io: Server, socket: Socket) => {
         if (room.author === socket.id) {
           io.to(room.roomCode).emit("leaveRoom", "Admin left");
           io.socketsLeave(room.roomCode);
+          destroyRoom(room.roomCode);
           deleteUserRoom(room.roomCode, socket.id);
         }
         if (user.id !== socket.id) {

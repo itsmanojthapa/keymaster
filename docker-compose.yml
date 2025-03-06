@@ -1,0 +1,9 @@
+version: "3.8"
+name: keymaster
+services:
+  keymaster:
+    build: .
+    container_name: keymaster
+    ports:
+      - "3000:3000"
+    restart: always

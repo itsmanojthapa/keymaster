@@ -1,0 +1,41 @@
+# Node modules (except when using multi-stage builds)
+node_modules
+.yarn
+.yarn-cache
+
+# Next.js build output (already copied selectively)
+.next/cache
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Git files
+.git
+.gitignore
+
+# Editor config files
+.vscode
+.idea
+
+# Other unnecessary files
+*.swp
+*.swo
+output.json
+
+
+LICENSE
+README.md
+docker-compose.yml

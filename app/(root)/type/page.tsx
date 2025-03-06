@@ -34,6 +34,26 @@ export default function Type() {
   const [isStarted, setIsStarted] = useState(false);
   const [startTime, setStartTime] = useState(0);
 
+  const [isFocused, setIsFocused] = useState(false);
+
+  useEffect(() => {
+    const handleFocus = () => setIsFocused(true);
+    const handleBlur = () => setIsFocused(false);
+
+    const inputElement = inputRef.current;
+    if (inputElement) {
+      inputElement.addEventListener("focus", handleFocus);
+      inputElement.addEventListener("blur", handleBlur);
+    }
+
+    return () => {
+      if (inputElement) {
+        inputElement.removeEventListener("focus", handleFocus);
+        inputElement.removeEventListener("blur", handleBlur);
+      }
+    };
+  }, [inputRef]);
+
   const [stats, setStats] = useState<TypeTypingStats>({
     wpm: 0,
     accuracy: 0,
@@ -170,7 +190,7 @@ export default function Type() {
 
         {(mode === "show" || mode === "typing") && (
           <div className="relative">
-            <ShowText inputText={inputText} text={text} />
+            <ShowText inputText={inputText} text={text} isFocused={isFocused} />
             <input
               ref={inputRef}
               value={inputText}

@@ -28,8 +28,8 @@ app.prepare().then(() => {
 });
 
 //write db to file every 3 seconds
-const writeToFile = () => {
-  fs.writeFile("output.json", JSON.stringify(db, null, 2), (err) => {
-    if (err) console.error("Error writing file:", err);
-  });
-};
+// const writeToFile = () => {
+//   fs.writeFile("output.json", JSON.stringify(db, null, 2), (err) => {
+//     if (err) console.error("Error writing file:", err);
+//   });
+// };
