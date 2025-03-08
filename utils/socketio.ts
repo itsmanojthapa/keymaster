@@ -8,7 +8,7 @@ export const initSocket = () => {
   if (socket) {
     disSocket();
   }
-  socket = io(); // Update with your server URL if needed
+  socket = io(process.env.PUBLIC_URL as string);
   return socket;
 };
 

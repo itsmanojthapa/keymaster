@@ -1,15 +1,12 @@
+import { ChangePasswordForm } from "@/components/(auth)/change-password-form";
 import React from "react";
 
 const Page = () => {
   return (
     <div className="">
-      Change password Change password Change passwordChange passwordChange
-      passwordChange passwordChange passwordChange passwordChange passwordChange
-      passwordChange passwordChange passwordChange passwordChange passwordChange
-      passwordChange passwordChange passwordChange passwordChange passwordChange
-      passwordChange passwordChange passwordChange passwordChange passwordChange
-      passwordChange passwordChange passwordChange passwordChange passwordChange
-      password
+      <div className="w-full max-w-3xl rounded-xl px-6 shadow-lg">
+        <ChangePasswordForm />
+      </div>
     </div>
   );
 };

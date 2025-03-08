@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 import { Toaster } from "@/components/ui/toaster";
+import { SessionProvider } from "next-auth/react";
 
 export const metadata: Metadata = {
   title: "KeyMaster",
@@ -16,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en ">
       <body className={`dark bg-zinc-950 antialiased`}>
-        <main>{children}</main>
+        <SessionProvider>{children} </SessionProvider>
         <Toaster />
       </body>
     </html>

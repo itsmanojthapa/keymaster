@@ -42,7 +42,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </nav>
         </aside>
         {/* Main Content */}
-        <main className="flex-1 overflow-auto p-8">{children}</main>
+        <main className="flex-1 overflow-auto px-8">{children}</main>
       </div>
     </motion.div>
   );

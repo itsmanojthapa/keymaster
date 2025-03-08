@@ -16,9 +16,14 @@ import { redirect, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
 import { disSocket, initSocket } from "@/utils/socketio";
+import { useSession } from "next-auth/react";
 
 const Multiplayer = () => {
+  const { data: session } = useSession();
+  if (!session?.user?.id) redirect("/login");
+
   const router = useRouter();
+
   const { toast } = useToast();
 
   const [jRoom, setJRoom] = useState("");
@@ -32,6 +37,9 @@ const Multiplayer = () => {
   const handleJRoom = (e: React.FormEvent) => {
     setClickedJ(true);
     e.preventDefault();
+
+    if (!session?.user) redirect("/login");
+
     const socket = initSocket();
 
     socket.on("joinRoom", (msg: string, error) => {
@@ -56,6 +64,7 @@ const Multiplayer = () => {
   };
   const handleCRoom = () => {
     setClickedC(true);
+    if (!session?.user) redirect("/login");
     const socket = initSocket();
 
     socket.on("createRoom", (roomName: string) => {
@@ -65,7 +74,12 @@ const Multiplayer = () => {
     });
 
     if (socket) {
-      socket.emit("createRoom", text, selectedTime);
+      socket.emit("createRoom", {
+        text,
+        selectedTime,
+        userID: session?.user?.id,
+        userName: session?.user?.name,
+      });
     } else {
       setClickedC(false);
       toast({ variant: "destructive", title: "ERROR: Socket not initialized" });

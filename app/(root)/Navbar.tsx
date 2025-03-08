@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Crown, Flag, Swords, User } from "lucide-react";
+import { Crown, Flag, LogOut, Swords, User } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
+import { signOut, useSession } from "next-auth/react";
 
 const pages = [
   { path: "/type", name: "Start", icon: <Flag /> },
@@ -15,6 +16,8 @@ const pages = [
 
 const Navbar = () => {
   const pathname = usePathname();
+  const { data: session } = useSession();
+
   return (
     <nav className="fixed z-50 flex w-full pb-3 pt-5 font-bold backdrop-blur-md">
       <motion.div
@@ -31,10 +34,10 @@ const Navbar = () => {
           <span>KeyMaster</span>
         </Link>
         <div className="mt-0 flex h-full justify-center space-x-10 text-lg md:space-x-4">
-          {pages.map((page) => {
+          {pages.map((page, i) => {
             return (
               <Link
-                key={page.path}
+                key={i}
                 href={page.path}
                 className={`flex items-center space-x-2 hover:text-teal-400 ${pathname === page.path ? "text-teal-400" : "text-zinc-400"}`}
               >
@@ -43,11 +46,14 @@ const Navbar = () => {
               </Link>
             );
           })}
-          {/* <div
-            className={`flex items-center space-x-2 text-zinc-400 hover:text-teal-400`}
-          >
-            <LogOut />
-          </div> */}
+          {session?.user && (
+            <div
+              className={`flex items-center space-x-2 text-zinc-400 hover:text-teal-400`}
+              onClick={() => signOut()}
+            >
+              <LogOut />
+            </div>
+          )}
         </div>
       </motion.div>
     </nav>
