@@ -13,6 +13,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { BadgeCheck } from "lucide-react";
+import { auth } from "@/auth/auth";
 
 // Profile data type
 type TestHistory = {
@@ -51,18 +52,29 @@ const testHistory: TestHistory[] = [
   },
 ];
 
-function Profile() {
+async function Profile() {
+  const session = await auth();
   return (
     <div className="flex flex-col items-center">
       <div className="flex flex-col items-center justify-center">
-        <Avatar className="h-24 w-24">
-          <AvatarImage src="/avatar.png" alt="User Avatar" />
-          <AvatarFallback>U</AvatarFallback>
-        </Avatar>
+        <Avatar className="h-24 w-24 ring-2 ring-blue-500/20">
+          <AvatarImage
+            className="h-full w-full object-cover"
+            src={`${session?.user?.image}`}
+          />
 
-        <p className="mt-5 text-lg font-semibold">Username: FastTyper</p>
+          <AvatarFallback>
+            <AvatarImage
+              className="h-full w-full object-cover"
+              src={`https://api.dicebear.com/8.x/bottts/svg?seed=${session?.user?.name}`}
+            />
+          </AvatarFallback>
+        </Avatar>
+        <p className="mt-5 text-lg font-semibold">
+          Username: {`${session?.user?.name}`}
+        </p>
         <div className="flex items-center justify-center space-x-2 text-sm">
-          <p>Email: fasttyper@example.com</p>
+          <p>Email: {`${session?.user?.email}`}</p>
           {true && <BadgeCheck className="bg-black text-teal-300" />}
         </div>
       </div>

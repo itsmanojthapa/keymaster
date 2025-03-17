@@ -7,7 +7,7 @@ import Typists from "@/components/ui/Typists";
 import Chat from "@/components/Chat";
 import { motion } from "framer-motion";
 import { motionSet } from "@/lib/motionSet";
-import { disSocket, getSocket } from "@/utils/socketio";
+import { disSocket, getSocket } from "@/lib/socketClient/socketio";
 import { useToast } from "@/hooks/use-toast";
 import { redirect } from "next/navigation";
 import ShowText from "@/components/ShowText";
@@ -81,6 +81,7 @@ export default function Page({
       if (roomData) {
         setMessages(roomData?.messages || []);
         setRoomData(roomData);
+        console.log(roomData);
       }
     });
 
@@ -253,7 +254,7 @@ export default function Page({
         return {
           ...prev,
           users: prev.users.map((user) => {
-            if (user.id === id) {
+            if (user.socketID === id) {
               user.inputLength = inputLength;
             }
             return user;
@@ -267,7 +268,7 @@ export default function Page({
         return {
           ...prev,
           users: prev.users.map((user) => {
-            if (user.id === id) {
+            if (user.socketID === id) {
               user.resultData = resultData;
             }
             return user;
@@ -351,7 +352,7 @@ export default function Page({
           </div>
 
           <div className="flex space-x-3">
-            {socket?.id === roomData?.author && !letsgo && (
+            {socket?.id === roomData?.authorSocketID && !letsgo && (
               <Button
                 className="w-full bg-gradient-to-r from-teal-500 to-blue-600 font-bold shadow-lg transition-all hover:from-blue-600 hover:to-teal-700 hover:text-zinc-100 hover:shadow-teal-500/20 sm:w-auto"
                 onClick={() => {
@@ -401,7 +402,7 @@ export default function Page({
             <Stats stats={stats} time={timeUsed} />
             <div className="relative flex items-center justify-center">
               <ShowText
-                text={roomData?.text || ""}
+                text={roomData?.text as string}
                 inputText={start ? inputText : undefined}
                 isFocused={isFocused}
               />
@@ -427,13 +428,13 @@ export default function Page({
                 return user.status === "active" ? (
                   <Pck
                     value={
-                      user.id === socket.id
+                      user.socketID === socket.id
                         ? perLength(inputText.length, roomData.text.length) ||
                           0.1
                         : perLength(user.inputLength, roomData.text.length) ||
                           0.1
                     }
-                    user={{ id: user.id }}
+                    user={{ name: user.name, image: user.image }}
                     key={i}
                   />
                 ) : (
@@ -443,7 +444,7 @@ export default function Page({
             </Card>
           </div>
         ) : (
-          <>
+          <div className="flex w-full justify-center">
             <Card className="w-fit border-zinc-800/50 bg-zinc-900/50 p-4 shadow-xl backdrop-blur-sm">
               {result?.map((user, i) => {
                 return user.status === "active" ? (
@@ -457,7 +458,7 @@ export default function Page({
                 );
               })}
             </Card>
-          </>
+          </div>
         )}
       </motion.div>
     </main>

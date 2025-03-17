@@ -42,3 +42,5 @@ dist/
 
 #testing
 output.json
+
+log_*.json

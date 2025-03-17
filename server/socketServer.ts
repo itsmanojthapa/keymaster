@@ -1,10 +1,16 @@
 import { Server as HttpServer } from "http";
 import { Server, Socket } from "socket.io";
 import eventHandlers from "./eventHandlers";
+import { authenticateSocket } from "./authenticate";
 // import { getUserFromDB } from "@/lib/actions/getUserFromDB";
 
 const onConnection = async (io: Server, socket: Socket) => {
   try {
+    if (!socket.data.user) {
+      socket.disconnect();
+      return;
+    }
+
     const {
       handleInit,
       handleRoomExists,
@@ -47,6 +53,10 @@ export const initSocket = (httpServer: HttpServer) => {
         credentials: true,
       },
     });
+
+    // Use middleware for authentication
+    io.use(authenticateSocket);
+
     io.on("connection", (socket: Socket) => onConnection(io, socket));
     console.log("🚀 Socket server initialized ");
   } catch (err) {

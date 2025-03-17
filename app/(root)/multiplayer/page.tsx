@@ -9,18 +9,17 @@ import { LoaderCircle, LogIn, Plus } from "lucide-react";
 import CustomText from "@/components/CustomText";
 import Control from "@/components/Control";
 import { Spec } from "@/components/spec";
-import { TypeTimeOption } from "@/types/types";
+import { TypeCreateRoom, TypeTimeOption } from "@/types/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { redirect, useRouter } from "next/navigation";
 
 import { useToast } from "@/hooks/use-toast";
 
-import { disSocket, initSocket } from "@/utils/socketio";
+import { disSocket, initSocket } from "@/lib/socketClient/socketio";
 import { useSession } from "next-auth/react";
 
 const Multiplayer = () => {
   const { data: session } = useSession();
-  if (!session?.user?.id) redirect("/login");
 
   const router = useRouter();
 
@@ -40,7 +39,23 @@ const Multiplayer = () => {
 
     if (!session?.user) redirect("/login");
 
-    const socket = initSocket();
+    const socket = initSocket(session?.user?.id as string);
+
+    if (!socket) {
+      setClickedJ(false);
+      toast({ variant: "destructive", title: "ERROR" });
+      disSocket();
+      return;
+    }
+    const setClickFlase = () => {
+      setClickedJ(false);
+    };
+
+    socket.on("error", (message) => {
+      disSocket();
+      setClickFlase();
+      toast({ variant: "destructive", title: message });
+    });
 
     socket.on("joinRoom", (msg: string, error) => {
       if (error) {
@@ -65,7 +80,24 @@ const Multiplayer = () => {
   const handleCRoom = () => {
     setClickedC(true);
     if (!session?.user) redirect("/login");
-    const socket = initSocket();
+
+    const socket = initSocket(session?.user?.id as string);
+
+    if (!socket) {
+      setClickedC(false);
+      toast({ variant: "destructive", title: "ERROR" });
+      disSocket();
+      return;
+    }
+    const setClickFlase = () => {
+      setClickedC(false);
+    };
+
+    socket.on("error", (message) => {
+      disSocket();
+      setClickFlase();
+      toast({ variant: "destructive", title: message });
+    });
 
     socket.on("createRoom", (roomName: string) => {
       socket.emit("joinRoom", roomName);
@@ -73,13 +105,13 @@ const Multiplayer = () => {
       redirect(`/multiplayer/room/${roomName}`);
     });
 
+    const data: TypeCreateRoom = {
+      text: text,
+      selectedTime: selectedTime,
+    };
+
     if (socket) {
-      socket.emit("createRoom", {
-        text,
-        selectedTime,
-        userID: session?.user?.id,
-        userName: session?.user?.name,
-      });
+      socket.emit("createRoom", data); //Create Room
     } else {
       setClickedC(false);
       toast({ variant: "destructive", title: "ERROR: Socket not initialized" });

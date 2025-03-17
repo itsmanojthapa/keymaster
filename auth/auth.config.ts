@@ -2,7 +2,7 @@ import { AuthError, type NextAuthConfig } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { signInSchema } from "@/lib/zod";
-import prisma from "@/prisma/prisma";
+import prisma from "@/prisma/client";
 import { comparePassword } from "@/utils/password";
 import { Resend } from "resend";
 import jwt from "jsonwebtoken";
@@ -95,7 +95,6 @@ export default {
               expiresAt: new Date(Date.now() + 1000 * 60 * 30), // 30 minutes
             },
           });
-          console.log("new URL |------------>");
           console.log(`${process.env.BASE_URL}/verify-email/${token}`);
 
           const { data, error } = await resend.emails.send({

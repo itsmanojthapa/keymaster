@@ -4,11 +4,11 @@ import { io, Socket } from "socket.io-client";
 
 let socket: Socket | null = null;
 
-export const initSocket = () => {
+export const initSocket = (userId: string) => {
   if (socket) {
     disSocket();
   }
-  socket = io(process.env.PUBLIC_URL as string);
+  socket = io(process.env.PUBLIC_URL as string, { query: { userId } });
   return socket;
 };
 

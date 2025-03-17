@@ -10,34 +10,43 @@ import {
   roomsTimeoutTime,
 } from "./roomUtils";
 import { calculateStats } from "../lib/CalculateStats";
+import { TypeCreateRoom } from "../types/types";
 
 const eventHandlers = (io: Server, socket: Socket) => {
-  const handleCreateRoom = (text: string, time: number) => {
+  const handleCreateRoom = (data: TypeCreateRoom) => {
     let roomCode = generateHex();
     while (io.sockets.adapter.rooms.has(roomCode)) {
       roomCode = generateHex();
     }
     socket.join(roomCode);
-    if (!roomsTimeout.find((room) => room.roomCode === roomCode)) {
-      roomsTimeout.push({
-        roomCode: roomCode,
-        timeout: setTimeout(() => {
-          destroyRoom(roomCode);
-        }, roomsTimeoutTime),
-      });
-    }
+
+    roomsTimeout.push({
+      roomCode: roomCode,
+      timeout: setTimeout(() => {
+        destroyRoom(roomCode);
+      }, roomsTimeoutTime),
+    });
 
     db.push({
       roomCode: roomCode,
-      author: socket.id,
+      authorUserID: socket.data.user.id,
+      authorSocketID: socket.id,
       gameStarted: false,
       gameStartedTime: null,
       gameEnded: false,
-      text: text,
+      text: data.text,
       users: [
-        { id: socket.id, status: "active", inputLength: 0, inputText: "" },
+        {
+          socketID: socket.id,
+          userID: socket.data.user.id,
+          name: socket.data.user.name,
+          image: socket.data.user.image,
+          status: "active",
+          inputLength: 0,
+          inputText: "",
+        },
       ],
-      time: time,
+      time: data.selectedTime,
       date: new Date(),
       messages: [],
     });
@@ -73,10 +82,13 @@ const eventHandlers = (io: Server, socket: Socket) => {
         return;
       }
 
-      const user = userExistsInRoom(roomCode, socket.id);
+      const user = userExistsInRoom(roomCode, socket.data.user.id);
       if (!user) {
         room?.users.push({
-          id: socket.id,
+          userID: socket.data.user.id,
+          socketID: socket.id,
+          name: socket.data.user.name,
+          image: socket.data.user.image,
           status: "active",
           inputText: "",
           inputLength: 0,
@@ -110,14 +122,14 @@ const eventHandlers = (io: Server, socket: Socket) => {
   };
   const handleLeaveRoom = (roomCode: string) => {
     const room = findRoom(roomCode);
-    if (room?.author === socket.id) {
+    if (room?.authorSocketID === socket.id) {
       deleteRoom(roomCode);
       io.to(roomCode).emit("leaveRoom", "Admin left");
       io.socketsLeave(roomCode);
     }
 
     socket.leave(roomCode);
-    deleteUserRoom(roomCode, socket.id);
+    deleteUserRoom(roomCode, socket.data.user.id);
 
     io.to(roomCode).emit(
       "noOfUsersInRoom",
@@ -177,15 +189,15 @@ const eventHandlers = (io: Server, socket: Socket) => {
         });
         io.to(roomCode).emit("gameResult", room?.users);
 
-        // Finally, remove users from the room after resultDuration
+        //store room data in cloud db
         setTimeout(() => {
+          // Finally, remove users from the room after resultDuration
           io.to(roomCode).emit("leaveRoom", "Session completed");
           io.socketsLeave(roomCode);
-          //store room data in cloud db
           deleteRoom(roomCode); // Cleanup room data
-        }, 1000 * 30);
+        }, 1000 * 30); //leave room after 30 seconds
       },
-      1000 * (room.time + 3),
+      1000 * (room.time + 3), // Calculate Game result after game duration + 3 sec timer
     );
   };
 
@@ -205,7 +217,7 @@ const eventHandlers = (io: Server, socket: Socket) => {
       return;
     }
 
-    const user = room.users.find((user) => user.id === socket.id);
+    const user = room.users.find((user) => user.userID === socket.data.user.id);
     if (user) {
       user.inputLength = inputLength;
       user.inputText = inputText;
@@ -222,17 +234,17 @@ const eventHandlers = (io: Server, socket: Socket) => {
       let i = false;
       room.users.forEach((user) => {
         i = false;
-        if (room.author === socket.id) {
+        if (room.authorSocketID === socket.id) {
           io.to(room.roomCode).emit("leaveRoom", "Admin left");
           io.socketsLeave(room.roomCode);
           destroyRoom(room.roomCode);
-          deleteUserRoom(room.roomCode, socket.id);
-        }
-        if (user.id !== socket.id) {
-          deleteUserRoom(room.roomCode, socket.id);
+        } else if (user.socketID !== socket.id) {
+          i = true;
+          deleteUserRoom(room.roomCode, socket.data.user.id);
         }
       });
       if (i) {
+        //user disconnected from room but not admin update users in room
         io.to(room.roomCode).emit(
           "noOfUsersInRoom",
           io.sockets.adapter.rooms.get(room.roomCode)?.size || 0,

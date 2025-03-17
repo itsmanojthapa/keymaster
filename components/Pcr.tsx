@@ -1,5 +1,5 @@
 import React from "react";
-import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { TypeUser } from "@/types/types";
 import Timer from "./Timer";
 
@@ -11,12 +11,19 @@ type typee = {
 const Pcr = ({ user, time }: typee) => {
   return (
     <div
-      key={user.id}
+      key={user.name}
       className="flex flex-row items-center gap-3 rounded-lg p-2 transition-colors hover:bg-zinc-800/30"
     >
       <Avatar className="h-8 w-8 ring-2 ring-blue-500/20 md:h-10 md:w-10">
-        <AvatarFallback className="bg-gradient-to-br from-blue-500 to-emerald-500 text-white">
-          photo
+        <AvatarImage
+          className="h-full w-full object-cover"
+          src={`${user.image}`}
+        />
+        <AvatarFallback>
+          <AvatarImage
+            className="h-full w-full object-cover"
+            src={`https://api.dicebear.com/8.x/bottts/svg?seed=${user.name}`}
+          />
         </AvatarFallback>
       </Avatar>
       {user?.status && (
@@ -34,7 +41,7 @@ const Pcr = ({ user, time }: typee) => {
           )}
         </div>
       )}
-      <p className="text-nowrap font-medium text-blue-400">{user.id}</p>
+      <p className="text-nowrap font-medium text-blue-400">{user.name}</p>
 
       <div className="ml-5 flex flex-wrap items-center justify-center gap-4 text-center font-mono text-sm sm:gap-8 sm:text-lg">
         <div>

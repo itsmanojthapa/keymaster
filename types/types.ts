@@ -1,14 +1,17 @@
-type TypeTypingStats = {
+export type TypeTypingStats = {
   wpm: number;
   accuracy: number;
   correct: number;
   wrong: number;
 };
 
-type TypeTimeOption = 15 | 30 | 60 | 120;
+export type TypeTimeOption = 15 | 30 | 60 | 120;
 
-type TypeUser = {
-  id: string;
+export type TypeUser = {
+  socketID: string;
+  userID: string;
+  name: string;
+  image: string;
   status: "active" | "inactive";
   inputText: string;
   timetaken?: number;
@@ -16,9 +19,10 @@ type TypeUser = {
   resultData?: TypeTypingStats;
 };
 
-interface TypeRoom {
+export type TypeRoom = {
   roomCode: string;
-  author: string;
+  authorUserID: string;
+  authorSocketID: string;
   gameStarted: boolean;
   gameStartedTime: Date | null;
   gameEnded: boolean;
@@ -27,17 +31,14 @@ interface TypeRoom {
   time: number;
   date: Date;
   messages: string[];
-}
+};
 
-type TypeRoomsTimeout = {
+export type TypeRoomsTimeout = {
   roomCode: string;
   timeout: NodeJS.Timeout;
 }[];
 
-export type {
-  TypeTypingStats,
-  TypeTimeOption,
-  TypeUser,
-  TypeRoom,
-  TypeRoomsTimeout,
+export type TypeCreateRoom = {
+  text: string;
+  selectedTime: number;
 };

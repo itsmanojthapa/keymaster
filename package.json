@@ -2,14 +2,15 @@
   "name": "typetest",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
+  "type": "commonjs",
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "scripts": {
     "dev": "nodemon",
     "build": "next build && tsc --project tsconfig.server.json",
-    "start": "cross-env NODE_ENV=production node dist/server/server.js",
+    "lint": "next lint",
+    "start": "cross-env NODE_ENV=production node ./dist/server/server.js",
     "migrate": "prisma migrate dev",
     "gen": "prisma generate",
     "studio": "prisma studio",
@@ -52,6 +53,7 @@
     "react-dom": "19.0.0-rc-66855b96-20241106",
     "react-hook-form": "^7.54.2",
     "recharts": "^2.15.0",
+    "redis": "^4.7.0",
     "resend": "^4.1.2",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
