@@ -16,21 +16,23 @@ export type TypeUser = {
   inputText: string;
   timetaken?: number;
   inputLength: number;
-  resultData?: TypeTypingStats;
+  wpm: number | undefined;
+  accuracy: number | undefined;
+  correct: number | undefined;
+  wrong: number | undefined;
 };
 
 export type TypeRoom = {
   roomCode: string;
-  authorUserID: string;
-  authorSocketID: string;
+  adminUserID: string;
+  adminSocketID: string;
   gameStarted: boolean;
-  gameStartedTime: Date | null;
+  gameStartedTime?: number;
   gameEnded: boolean;
   text: string;
-  users: TypeUser[];
+  users: string[];
   time: number;
   date: Date;
-  messages: string[];
 };
 
 export type TypeRoomsTimeout = {

@@ -11,10 +11,6 @@ const ShowText = ({
   text: string;
   isFocused?: boolean;
 }) => {
-  console.log("--------------------");
-  console.log(text);
-  console.log("--------------------");
-
   return (
     <motion.div
       {...motionSet}

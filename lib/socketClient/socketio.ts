@@ -8,7 +8,10 @@ export const initSocket = (userId: string) => {
   if (socket) {
     disSocket();
   }
-  socket = io(process.env.PUBLIC_URL as string, { query: { userId } });
+  socket = io(process.env.AUTH_URL as string, {
+    withCredentials: true,
+    query: { userId },
+  });
   return socket;
 };
 

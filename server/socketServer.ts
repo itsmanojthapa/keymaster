@@ -1,8 +1,9 @@
 import { Server as HttpServer } from "http";
 import { Server, Socket } from "socket.io";
-import eventHandlers from "./eventHandlers";
+import controller from "./controllerSocket";
 import { authenticateSocket } from "./authenticate";
-// import { getUserFromDB } from "@/lib/actions/getUserFromDB";
+import { createAdapter } from "@socket.io/redis-adapter";
+import { pubClient, subClient } from "./redisClient";
 
 const onConnection = async (io: Server, socket: Socket) => {
   try {
@@ -14,28 +15,26 @@ const onConnection = async (io: Server, socket: Socket) => {
     const {
       handleInit,
       handleRoomExists,
-      handleMessageRoom,
+      handleMessage,
       handleCreateRoom,
       handleJoinRoom,
-      handleUsersInRoom,
-      handleLetsbegin,
-      handleNoOfUsersInRoom,
+      handleGetUsers,
+      handleStart,
       handleLeaveRoom,
       handleTyping,
       handleDisconnect,
-    } = eventHandlers(io, socket);
+    } = controller(io, socket);
 
-    socket.on("init", handleInit);
-    socket.on("roomExists", handleRoomExists);
-    socket.on("messageRoom", handleMessageRoom);
     socket.on("createRoom", handleCreateRoom);
+    socket.on("roomExists", handleRoomExists);
+    socket.on("init", handleInit);
     socket.on("joinRoom", handleJoinRoom);
     socket.on("leaveRoom", handleLeaveRoom);
-    socket.on("noOfUsersInRoom", handleNoOfUsersInRoom);
-    socket.on("usersInRoom", handleUsersInRoom);
+    socket.on("message", handleMessage);
+    socket.on("getUsers", handleGetUsers);
 
-    socket.on("gameLetsbegin", handleLetsbegin);
-    socket.on("gameTyping", handleTyping);
+    socket.on("start", handleStart);
+    socket.on("typing", handleTyping);
 
     socket.on("disconnect", handleDisconnect);
   } catch (error) {
@@ -44,14 +43,17 @@ const onConnection = async (io: Server, socket: Socket) => {
   }
 };
 
-export const initSocket = (httpServer: HttpServer) => {
+export const initSocket = async (httpServer: HttpServer) => {
   try {
+    await Promise.all([pubClient.connect(), subClient.connect()]);
+
     const io = new Server(httpServer, {
       cors: {
-        origin: process.env.PUBLIC_URL,
+        origin: process.env.AUTH_URL,
         methods: ["GET", "POST"],
         credentials: true,
       },
+      adapter: createAdapter(pubClient, subClient),
     });
 
     // Use middleware for authentication

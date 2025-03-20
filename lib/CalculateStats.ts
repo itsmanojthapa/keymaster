@@ -28,7 +28,7 @@ export function calculateStats(
   }
 
   const totalChars = textLength(inputText); // Total characters typed
-  const minutes = timeUsed / 60000; // Convert ms to minutes
+  const minutes = timeUsed / (1000 * 60); // Convert ms to minutes
 
   // Prevent unrealistic small minute values to prevent 12000 WPM ERROR for first character
   const safeMinutes = minutes > 0.01 ? minutes : 0.01; // Set a minimum value of 0.01 minutes

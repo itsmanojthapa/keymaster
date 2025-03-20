@@ -1,4 +1,4 @@
-import prisma from "../../prisma/client";
+import prisma from "../../server/prismaClient";
 
 export const getUserFromDB = async (userId: string) => {
   try {

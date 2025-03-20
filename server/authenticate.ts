@@ -6,12 +6,15 @@ export const authenticateSocket = async (
   next: (err?: Error) => void,
 ) => {
   try {
-    const userId = socket.handshake.query.userId as string;
+    const userId = socket.handshake.query.userId;
 
-    const user = await getUserFromDB(userId);
+    if (userId) {
+      const user = await getUserFromDB(userId as string);
 
-    // Store authenticated user in socket
-    socket.data.user = user;
+      // Store authenticated user in socket
+      // it make user data available in all socket events socket.data.user.id etc.
+      socket.data.user = user;
+    }
 
     next(); // Proceed to connection
   } catch (error) {

@@ -6,10 +6,9 @@ import { TypeUser } from "@/types/types";
 
 type typee = {
   users?: TypeUser[];
-  connectedSockets: number;
 };
 
-const Typists = ({ users, connectedSockets }: typee) => {
+const Typists = ({ users }: typee) => {
   return (
     <Card className="border-zinc-800/50 bg-zinc-900/50 p-4 shadow-xl backdrop-blur-sm">
       <div className="mb-6 flex items-center gap-2">
@@ -17,7 +16,7 @@ const Typists = ({ users, connectedSockets }: typee) => {
           <Users className="h-5 w-5 text-white" />
         </div>
         <h2 className="text-lg font-bold md:text-xl">
-          Typists {connectedSockets ? `(${connectedSockets})` : "1"}
+          Typists {users ? `(${users.length})` : "1"}
         </h2>
       </div>
 

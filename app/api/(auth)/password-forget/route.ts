@@ -1,5 +1,5 @@
 import { passwordSchema } from "@/lib/zod";
-import prisma from "@/prisma/client";
+import prisma from "@/server/prismaClient";
 import { encryptPassword } from "@/utils/password";
 
 import { NextResponse } from "next/server";

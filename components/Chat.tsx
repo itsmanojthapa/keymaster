@@ -1,25 +1,27 @@
 "use client";
 
 import { Card } from "./ui/card";
-import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { MessageSquare, Send } from "lucide-react";
 import { Socket } from "socket.io-client";
 import React, {
-  Dispatch,
-  SetStateAction,
+  // Dispatch,
+  // SetStateAction,
   useEffect,
   useRef,
   useState,
 } from "react";
+import { TypeUser } from "@/types/types";
 
 type ChatProps = {
   socket: Socket;
   slug: string;
-  messages: string[];
-  setMessages: Dispatch<SetStateAction<string[]>>;
+  users: TypeUser[];
+  messages: { userID: string; message: string }[];
+  // setMessages: Dispatch<SetStateAction<string[]>>;
 };
 
-const Chat = ({ socket, slug, messages }: ChatProps) => {
+const Chat = ({ socket, slug, messages, users }: ChatProps) => {
   const [message, setMessage] = useState("");
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -33,10 +35,11 @@ const Chat = ({ socket, slug, messages }: ChatProps) => {
   const sendMessageHandler = (e: React.FormEvent) => {
     e.preventDefault();
     if (socket && message.trim()) {
-      socket.emit("messageRoom", slug, message);
+      socket.emit("message", slug, message);
       setMessage("");
     }
   };
+  const getUser = (userID: string) => users.find((u) => u.userID === userID);
 
   return (
     <Card className="border-zinc-800/50 bg-zinc-900/50 p-4 shadow-xl backdrop-blur-sm md:p-6 lg:col-span-2">
@@ -48,22 +51,50 @@ const Chat = ({ socket, slug, messages }: ChatProps) => {
       </div>
 
       <div className="custom-scrollbar mb-4 h-[300px] space-y-4 overflow-y-auto pr-2 md:h-[400px]">
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className="flex items-start gap-3 rounded-lg p-2 transition-colors hover:bg-zinc-800/30"
-          >
-            <Avatar className="h-8 w-8 ring-2 ring-emerald-500/20 md:h-10 md:w-10">
-              <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-blue-500 text-white">
-                Photo
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="font-medium text-emerald-400">name</p>
-              <p className="text-gray-300">{msg}</p>
+        {messages.map((msg, i) => {
+          const user = getUser(msg.userID);
+          return (
+            <div
+              key={i}
+              className="flex items-start gap-3 rounded-lg p-2 transition-colors hover:bg-zinc-800/30"
+            >
+              <Avatar className="h-8 w-8 ring-2 ring-blue-500/20">
+                {user?.image ? (
+                  <AvatarImage
+                    className="h-full w-full object-cover"
+                    src={`${user?.image}`}
+                  />
+                ) : (
+                  <AvatarFallback>
+                    <AvatarImage
+                      className="h-full w-full object-cover"
+                      src={`https://api.dicebear.com/8.x/bottts/svg?seed=${user?.name || "unknown"}`}
+                    />
+                  </AvatarFallback>
+                )}
+              </Avatar>
+              {/* <Avatar className="h-8 w-8 ring-2 ring-emerald-500/20 md:h-10 md:w-10">
+                {user?.image ? (
+                  <img
+                    src={user.image}
+                    alt={user.name}
+                    className="rounded-full"
+                  />
+                ) : (
+                  <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-blue-500 text-white">
+                    {user?.name?.charAt(0) || "?"}
+                  </AvatarFallback>
+                )}
+              </Avatar> */}
+              <div>
+                <p className="font-medium text-emerald-400">
+                  {user?.name || "Unknown"}
+                </p>
+                <p className="text-gray-300">{msg.message}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
         <div className="h-0" ref={messagesEndRef}></div>
       </div>
 

@@ -29,8 +29,9 @@ export default function Page({
   const [letsgo, setletsgo] = useState<boolean>(false);
   const socket = getSocket();
   const { toast } = useToast();
-  const [messages, setMessages] = useState<string[]>([]);
-  const [connectedSockets, setConnectedSockets] = useState(0);
+  const [messages, setMessages] = useState<
+    { userID: string; message: string }[]
+  >([]);
   const [status, setStatus] = useState(true);
   const [stats, setStats] = useState<TypeTypingStats>({
     wpm: 0,
@@ -39,8 +40,8 @@ export default function Page({
     wrong: 0,
   });
 
-  const [roomData, setRoomData] = useState<TypeRoom | null>();
-  const [result, setResult] = useState<TypeUser[] | null>();
+  const [roomData, setRoomData] = useState<TypeRoom>();
+  const [users, setUsers] = useState<TypeUser[]>([]);
 
   const [inputText, setInputText] = useState("");
   const [timeUsed, setTimeUsed] = useState(0);
@@ -48,15 +49,8 @@ export default function Page({
 
   const [countdown, setCountdown] = useState<number | false>(false);
   const [start, setStart] = useState<boolean>(false);
+  const [end, setEnd] = useState<boolean>(false);
   const [startTime, setStartTime] = useState(0);
-
-  // Authentication check (replace with actual logic)
-  function auth() {
-    return true;
-  }
-  if (!auth()) {
-    redirect("/login");
-  }
 
   useEffect(() => {
     if (!socket) {
@@ -68,7 +62,6 @@ export default function Page({
       }, 100);
       redirect("/multiplayer");
     }
-
     const handleRoomExists = (exists: string) => {
       if (exists === "false") {
         setTimeout(() => {
@@ -78,41 +71,23 @@ export default function Page({
       }
     };
     socket.once("init", (roomData: TypeRoom) => {
-      if (roomData) {
-        setMessages(roomData?.messages || []);
-        setRoomData(roomData);
-        console.log(roomData);
-      }
+      setRoomData(roomData);
     });
 
     socket.once("roomExists", handleRoomExists);
-    socket.once("gameEnd", () => {
-      setStart(false);
+    socket.once("end", () => {
+      setEnd(true);
       toast({ title: "Game Over! Showing results soon..." });
     });
-    socket.once("gameResult", (users) => {
-      toast({ title: "Result" });
-      setResult(users);
-    });
-
     socket.emit("roomExists", slug);
     socket.emit("joinRoom", slug);
     // Listen for new messages in the room
-    socket.on("message", (msg: string) => {
-      setMessages((prev) => [...prev, msg]);
+    socket.on("message", (userId: string, msg: string) => {
+      setMessages((prev) => [...prev, { userID: userId, message: msg }]);
     });
 
-    const handleNoOfUsersInRoom = (count: number) => {
-      setConnectedSockets(count);
-    };
-
-    const handleUsersInRoom = (users: TypeUser[]) => {
-      setRoomData((prev) => {
-        if (prev) {
-          return { ...prev, users: users };
-        }
-        return prev;
-      });
+    const handleGetUsers = (users: TypeUser[]) => {
+      setUsers(users);
     };
 
     const handleLeaveRoom = (msg: string) => {
@@ -124,7 +99,7 @@ export default function Page({
       redirect("/multiplayer");
     };
 
-    const handleLetsbegin = () => {
+    const handleStart = () => {
       setletsgo((v) => !v);
       setCountdown(1);
       const sss = setInterval(() => {
@@ -143,26 +118,19 @@ export default function Page({
       }, 1000);
     };
 
-    socket.on("noOfUsersInRoom", handleNoOfUsersInRoom);
-    socket.on("usersInRoom", handleUsersInRoom);
+    socket.on("getUsers", handleGetUsers);
     socket.on("leaveRoom", handleLeaveRoom);
 
-    socket.once("gameLetsbegin", handleLetsbegin);
+    socket.once("start", handleStart);
 
     const activity = setInterval(() => {
-      socket.emit("noOfUsersInRoom", slug);
-      socket.emit("usersInRoom", slug);
+      socket.emit("getUsers", slug);
       setStatus(socket?.connected);
     }, 1000 * 5);
 
     return () => {
       clearInterval(activity);
-      socket.off("noOfUsersInRoom");
-      socket.off("message");
-      socket.off("noOfUsersInRoom");
-      socket.off("usersInRoom");
-      socket.off("leaveRoom");
-      socket.off("gameLetsbegin");
+      disSocket();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket]);
@@ -171,13 +139,13 @@ export default function Page({
     if (start) {
       timerRef.current = window.setInterval(() => {
         setTimeUsed((time) => time + 1000);
-        if (!start) {
+        if (end) {
           clearInterval(timerRef.current);
         }
       }, 1000);
     }
     return () => clearInterval(timerRef.current);
-  }, [start, startTime]);
+  }, [start, startTime, end]);
 
   useEffect(() => {
     if (start) {
@@ -248,40 +216,26 @@ export default function Page({
   }
 
   const startTyping = () => {
-    socket.on("gameTyping", (id: string, inputLength: number) => {
-      setRoomData((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          users: prev.users.map((user) => {
-            if (user.socketID === id) {
-              user.inputLength = inputLength;
-            }
-            return user;
-          }),
-        };
+    socket.on("typing", (userID: string, inputLength: number) => {
+      setUsers((prev) => {
+        return prev.map((user) => {
+          if (user.userID === userID) {
+            user.inputLength = inputLength;
+          }
+          return user;
+        });
       });
     });
-    socket.once("gameResult", (id: string, resultData: TypeTypingStats) => {
-      setRoomData((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          users: prev.users.map((user) => {
-            if (user.socketID === id) {
-              user.resultData = resultData;
-            }
-            return user;
-          }),
-        };
-      });
+    socket.once("result", (users: TypeUser[]) => {
+      setUsers(users);
+      toast({ title: "Result" });
     });
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newText = e.target.value;
     setInputText(newText);
-    socket?.emit("gameTyping", roomData?.roomCode, newText.length, newText);
+    socket?.emit("typing", roomData?.roomCode, newText);
     const newStats = calculateStats(
       newText,
       roomData?.text || "",
@@ -352,11 +306,11 @@ export default function Page({
           </div>
 
           <div className="flex space-x-3">
-            {socket?.id === roomData?.authorSocketID && !letsgo && (
+            {socket?.id === roomData?.adminSocketID && !letsgo && (
               <Button
                 className="w-full bg-gradient-to-r from-teal-500 to-blue-600 font-bold shadow-lg transition-all hover:from-blue-600 hover:to-teal-700 hover:text-zinc-100 hover:shadow-teal-500/20 sm:w-auto"
                 onClick={() => {
-                  socket.emit("gameLetsbegin", slug);
+                  socket.emit("start", slug);
                 }}
               >
                 <Timer strokeWidth={3} className="mr-1 h-4 w-4" />
@@ -388,16 +342,13 @@ export default function Page({
             <Chat
               socket={socket}
               slug={slug}
+              users={users}
               messages={messages}
-              setMessages={setMessages}
             />
-            <Typists
-              users={roomData?.users}
-              connectedSockets={connectedSockets}
-            />
+            <Typists users={users} />
           </motion.div>
         )}
-        {letsgo && !result ? (
+        {letsgo && users && !end ? (
           <div>
             <Stats stats={stats} time={timeUsed} />
             <div className="relative flex items-center justify-center">
@@ -424,39 +375,41 @@ export default function Page({
               )}
             </div>
             <Card className="border-zinc-800/50 bg-zinc-900/50 p-4 shadow-xl backdrop-blur-sm">
-              {roomData?.users.map((user, i) => {
-                return user.status === "active" ? (
-                  <Pck
-                    value={
-                      user.socketID === socket.id
-                        ? perLength(inputText.length, roomData.text.length) ||
-                          0.1
-                        : perLength(user.inputLength, roomData.text.length) ||
-                          0.1
-                    }
-                    user={{ name: user.name, image: user.image }}
-                    key={i}
-                  />
-                ) : (
-                  <div className="hidden" key={i}></div>
-                );
-              })}
+              {roomData &&
+                users?.map((user, i) => {
+                  return user.status === "active" ? (
+                    <Pck
+                      value={
+                        user.socketID === socket.id
+                          ? perLength(inputText.length, roomData.text.length) ||
+                            0.1
+                          : perLength(user.inputLength, roomData.text.length) ||
+                            0.1
+                      }
+                      user={{ name: user.name, image: user.image }}
+                      key={i}
+                    />
+                  ) : (
+                    <div className="hidden" key={i}></div>
+                  );
+                })}
             </Card>
           </div>
         ) : (
           <div className="flex w-full justify-center">
             <Card className="w-fit border-zinc-800/50 bg-zinc-900/50 p-4 shadow-xl backdrop-blur-sm">
-              {result?.map((user, i) => {
-                return user.status === "active" ? (
-                  <Pcr
-                    user={user}
-                    key={i}
-                    time={roomData?.time ? roomData?.time * 1000 : 0}
-                  />
-                ) : (
-                  <div className="hidden" key={i}></div>
-                );
-              })}
+              {end &&
+                users?.map((user, i) => {
+                  return user.status === "active" ? (
+                    <Pcr
+                      user={user}
+                      key={i}
+                      time={roomData?.time ? roomData?.time * 1000 : 0}
+                    />
+                  ) : (
+                    <div className="hidden" key={i}></div>
+                  );
+                })}
             </Card>
           </div>
         )}

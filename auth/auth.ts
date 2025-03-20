@@ -1,10 +1,12 @@
 import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import authConfig from "./auth.config";
-import prisma from "@/prisma/client";
+import prisma from "@/server/prismaClient";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   ...authConfig,
+  // debug: true,
+  secret: process.env.AUTH_SECRET,
   adapter: PrismaAdapter(prisma),
   pages: {
     signIn: "/login",

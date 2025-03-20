@@ -52,34 +52,24 @@ const Pcr = ({ user, time }: typee) => {
         </div>
         <div>
           WPM:
-          <span className="text-teal-400">{user.resultData?.wpm ?? "0"}</span>
+          <span className="text-teal-400">{user.wpm ?? "0"}</span>
         </div>
         <div>
           Accuracy:
           <span
-            className={
-              user.resultData?.accuracy === 100
-                ? "text-teal-400"
-                : "text-red-400"
-            }
+            className={user.accuracy === 100 ? "text-teal-400" : "text-red-400"}
           >
-            {user.resultData?.accuracy ?? "0"}%
+            {user.accuracy ?? "0"}%
           </span>
         </div>
         <div>
           Correct:
-          <span className="text-teal-400">
-            {user.resultData?.correct ?? "0"}
-          </span>
+          <span className="text-teal-400">{user.correct ?? "0"}</span>
         </div>
         <div>
           Wrong:
-          <span
-            className={
-              user.resultData?.wrong === 0 ? "text-teal-400" : "text-red-400"
-            }
-          >
-            {user.resultData?.wrong ?? "0"}
+          <span className={user.wrong === 0 ? "text-teal-400" : "text-red-400"}>
+            {user.wrong ?? "0"}
           </span>
         </div>
       </div>
