@@ -44,7 +44,7 @@
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.472.0",
     "motion": "^11.18.1",
-    "next": "15.0.3",
+    "next": "^15.2.3",
     "next-auth": "^5.0.0-beta.25",
     "next-themes": "^0.4.4",
     "nodemon": "^3.1.9",
@@ -79,5 +79,6 @@
     "tailwindcss": "^3.4.1",
     "tsx": "^4.19.3",
     "typescript": "^5"
-  }
+  },
+  "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72"
 }
